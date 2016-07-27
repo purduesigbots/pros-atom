@@ -1,0 +1,11 @@
+'menu': [
+  {
+    'label': 'PROS'
+    'submenu': [
+      {
+        'label': 'Create new PROS Project'
+        'command': 'PROS:New-Project'
+      }
+    ]
+  }
+]
