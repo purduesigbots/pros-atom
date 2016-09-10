@@ -8,7 +8,7 @@ cli = require './cli'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
-universalConfig = require 'atom-universal-config'
+universalConfig = require './atom-universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 
 module.exports =

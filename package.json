@@ -2,8 +2,14 @@
   "name": "pros",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "Provides integration with the Purdue Robotics Operating System ecosystem",
+  "description": "Provides integration with the PROS ecosystem",
   "keywords": [
+    "pros",
+    "vex",
+    "robotics",
+    "cortex",
+    "vrc",
+    "purdue"
   ],
   "repository": "https://github.com/purduesigbots/pros-atom",
   "license": "MIT",
@@ -14,7 +20,6 @@
     "atom-linter": "^4.3.3",
     "atom-space-pen-views": "^2.1.1",
     "atom-package-deps": "^4.0.0",
-    "atom-universal-config": "*",
     "clang-flags": "0.2.2",
     "command-exists": "^1.0.0",
     "fs-extra": "^0.26.1",
