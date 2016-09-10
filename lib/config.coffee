@@ -1,6 +1,6 @@
 path = require 'path'
 fs = require 'fs'
-{loadConfig} = require './atom-universal-config'
+{loadConfig} = require './universal-config'
 
 module.exports =
 
