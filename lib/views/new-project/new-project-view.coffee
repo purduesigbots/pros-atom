@@ -39,17 +39,17 @@ module.exports =
 
     show: ->
       super
-      @dropdown.appendChild @createOption {
+      @dropdown.appendChild @createOption JSON.stringify({
         'depot': 'auto',
-        'version': 'latest' },
+        'version': 'latest' }),
         'Automatically select latest'
       @dropdown.appendChild @createOption null, 'Loading...'
-      cli.getTemplates ((result) =>
+      cli.getTemplates ((code, result) =>
         console.log result
         @dropdown.removeChild @dropdown.lastChild
         result.forEach (e) =>
           op = document.createElement('option')
-          op.value = e
+          op.value = JSON.stringify e
           op.innerHTML = e.version + ' from ' + e.depot
           @dropdown.appendChild(op)
         ), '--offline-only'
@@ -68,14 +68,29 @@ module.exports =
 
     create: ->
       directory = @directoryBox.getModel().getText()
-      kernel = @dropdown.options[@dropdown.selectedIndex].version
-      depot = @dropdown.options[@dropdown.selectedIndex].depot
-      cli.createNewInTerminal('"' + directory + '"', kernel, depot)
+      kernel = JSON.parse(@dropdown.options[@dropdown.selectedIndex].value).version
+      depot = JSON.parse(@dropdown.options[@dropdown.selectedIndex].value).depot
+      cli.createNewExecute(((code, output) =>
+        if code is 0
+          atom.notifications.addSuccess 'Created a new project', {
+            detail: output
+            dismissable: true
+          }
+          atom.open({
+            pathsToOpen: [directory],
+            newWindow: true,
+            devMode: atom.inDevMode(),
+            safeMode: atom.inSafeMode()
+          })
+        else
+          atom.notifications.addError 'Failed to create project', {
+            detail: output
+            dismissable: true
+          }
+        console.log output
+        ),
+        '"' + directory + '"', kernel, depot)
+      # cli.createNewInTerminal('"' + directory + '"', kernel, depot)
       @cancel()
-      atom.open({
-        pathsToOpen: [@directoryBox.getModel().getText()],
-        newWindow: true,
-        devMode: atom.inDevMode(),
-        safeMode: atom.inSafeMode()
-      })
+
       @directoryBox.getModel().setText ''

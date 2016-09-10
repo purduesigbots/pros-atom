@@ -5,6 +5,10 @@
       {
         'label': 'Create new PROS Project'
         'command': 'PROS:New-Project'
+      },
+      {
+        'label': 'Upgrade a PROS Project'
+        'command': 'PROS:Upgrade-Project'
       }
     ]
   }

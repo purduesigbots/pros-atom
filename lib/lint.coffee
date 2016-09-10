@@ -42,18 +42,18 @@ module.exports =
     if navigator.platform == 'Win32'
       command += '.exe'
 
-    handleLintOutput = (output) ->
+    handleLintOutput = (code, output) ->
       regex = "(?<file>.+):(?<line>\\d+):(?<col>\\d+):\\s*\\w*\\s*" +
         "(?<type>(error|warning|note)):\\s*(?<message>.*)"
       msgs = linthelp.parse output, regex
-      msgs.filter((entry) -> entry.filePath in lintable_file) \
-        .forEach (entry) -> entry.FilePath = real_file
+      msgs.filter((entry) -> entry.filePath == lintable_file) \
+        .forEach (entry) -> entry.filePath = real_file
       module.exports.messages[real_file] = msgs
       module.exports.linter?.setMessages?(msgs)
 
     commandExists command, (err, commandDoesExist) =>
       if err
-        atom.notifications.addError 'purdueros: Error trying to find command',
+        atom.notifications.addError 'pros: Error trying to find command',
         {
           detail: 'Error from command-exists: ' + err
         }
@@ -61,19 +61,19 @@ module.exports =
         command = "\"#{command}\""
         args = []
         grammar_type = @getValidGrammar editor
-        flags = if grammar_type = 'C++' then settings.lintDefaultCppFlags \
-          else if grammar_type = 'C' then settings.lintDefaultCFlags
+        flags = if grammar_type = 'C++' then settings.lint.default_Cpp_flags \
+          else if grammar_type = 'C' then settings.lint.default_Cpp_flags
         args = args.concat flags.split ' '
-        if settings.lintErrorLimit >= 0
-          args.push "-fmax-errors=#{settings.lintErrorLimit}"
-        for include in settings.lintIncludePaths
+        if settings.lint.error_limit >= 0
+          args.push "-fmax-errors=#{settings.lint.error_limit}"
+        for include in settings.include_paths
           args.push "-I\"#{path.join cwd, include}\""
-        if settings.lintSuppressWarnings then args.push '-w'
+        if settings.lint.suppress_warnings then args.push '-w'
         args.push "\"#{lintable_file}\""
         args = args.filter Boolean
         terminal.execute handleLintOutput, [command].concat(args), {includeStdErr: true}
       else
-        atom.notifications.addError 'purdueros: Error trying to find command',
+        atom.notifications.addError 'pros: Error trying to find command',
           {
             detail: "Couldn't find #{command} in environment"
           }
@@ -83,8 +83,17 @@ module.exports =
     if not editor? or editor.getGrammar().name not in @grammars then return
     module.exports.lint editor, editor.getPath(), editor.getPath()
 
+  lintOnTheFly: () =>
+    editor = atom.workspace.getActiveTextEditor()
+    if not editor? or editor.getGrammar().name not in @grammars then return
+    if not config.settings().lint.on_the_fly then return
+    temp = (require 'tempfile') path.extname editor.getPath()
+    (require 'fs-extra').outputFileSync temp, editor.getText()
+    module.exports.lint editor, temp, editor.getPath()
+
   consumeLinter: (indieRegistry) =>
     module.exports.linter = indieRegistry.register({name: 'PROS GCC Linter'})
     @subscriptions.add module.exports.linter
     atom.workspace.observeTextEditors (editor) =>
       @subscriptions.add editor.onDidSave module.exports.lintOnSave
+      @subscriptions.add editor.onDidStopChanging module.exports.lintOnTheFly

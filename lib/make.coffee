@@ -28,19 +28,28 @@ module.exports =
         return @files.length > 0
 
       settings: () ->
-        args = [ '-j' + atom.config.get('purdueros.parallel_make_jobs') or 2]
+        args = [ '-j' + atom.config.get('pros.parallel_make_jobs') or 2]
 
-        if navigator.platform == 'Win32' and !!process.env['PROS_TOOLCHAIN']
-          makeCmd = path.join process.env['PROS_TOOLCHAIN'], 'bin', 'make'
-        else
-          makeCmd = 'make'
-          
+        if navigator.platform == 'Win32' and !!process.env['PROS_TOOLCHAIN'] and \
+           process.env['PROS_TOOLCHAIN'] not in process.env['PATH']
+          process.env['PATH'] = path.join(process.env['PROS_TOOLCHAIN'], 'bin') + ';' \
+            + process.env['PATH']
+
+          # makeCmd = path.join process.env['PROS_TOOLCHAIN'], 'bin', 'make'
+        # else
+        makeCmd = 'make'
+
         defaultTarget = {
           exec: makeCmd,
           name: 'PROS GNU Make: default',
           args: args,
           sh: false,
-          errorMatch: errorMatch
+          functionMatch: (output) ->
+            console.log output
+            match = /((.+):(\d+):(\d+): (note|error|warning):\s*(.+))/gm.exec output
+            console.log match
+            return []
+          # errorMatch: errorMatch
         }
 
         promise = if atom.config.get 'build-make.useMake' \

@@ -1,11 +1,11 @@
 {
-  "name": "purdueros",
+  "name": "pros",
   "main": "./lib/main",
   "version": "0.0.0",
   "description": "Provides integration with the Purdue Robotics Operating System ecosystem",
   "keywords": [
   ],
-  "repository": "https://github.com/purduesigbots/purdueros-atom",
+  "repository": "https://github.com/purduesigbots/pros-atom",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
@@ -14,6 +14,8 @@
     "atom-linter": "^4.3.3",
     "atom-space-pen-views": "^2.1.1",
     "atom-package-deps": "^4.0.0",
+    "atom-universal-config": "*",
+    "clang-flags": "0.2.2",
     "command-exists": "^1.0.0",
     "fs-extra": "^0.26.1",
     "split-string": "^0.1.0",
@@ -21,11 +23,12 @@
     "voucher": "^0.1.2"
   },
   "package-deps": [
+    "linter",
     "tool-bar",
     "tool-bar-main",
     "build",
-    "linter-gcc",
-    "platformio-ide-terminal"
+    "platformio-ide-terminal",
+    "atom-beautify"
   ],
   "consumedServices": {
     "runInTerminal": {
@@ -42,6 +45,11 @@
       "versions": {
         "1.0.0": "consumeLinter"
       }
+    },
+    "status-bar": {
+      "versions": {
+        "1.0.0": "consumeStatusBar"
+      }
     }
   },
   "providedServices": {
@@ -49,6 +57,11 @@
       "description": "Runs GNU Make for PROS",
       "versions": {
         "2.0.0": "provideBuilder"
+      }
+    },
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "autocompleteProvider"
       }
     }
   }
