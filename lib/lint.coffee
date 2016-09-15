@@ -12,7 +12,7 @@ module.exports =
 
   activate: () =>
     @grammars = ['C', 'C++']
-    if not @subscriptions then @subscriptions = new CompositeDisposable
+    @subscriptions = new CompositeDisposable
 
   deactivate: () =>
     @subscriptions.dispose()
@@ -24,15 +24,11 @@ module.exports =
     else undefined
 
   lint: (editor, lintable_file, real_file) ->
-    # get current working directory
-    cwd = atom.project.getPaths()[0]
-    if !cwd
-      editor = atom.workspace.getActivePaneItem()
-      if editor
-        temp_file = editor.buffer.file
-        if temp_file
-          cwd = temp_file.getParent().getPath()
-    cwd = if cwd then cwd else ''
+    cwd = ''
+    current_path = atom.workspace.getActiveTextEditor().getPath()
+    for project in atom.project.getPaths()
+      if current_path.indexOf(project) == 0 and project.length > cwd
+        cwd = project
 
     settings = config.settings real_file
 
@@ -92,8 +88,6 @@ module.exports =
     module.exports.lint editor, temp, editor.getPath()
 
   consumeLinter: (indieRegistry) =>
-    # call activate every time in case it hasn't happened yet (usually on first install)
-    module.exports.activate()
     module.exports.linter = indieRegistry.register({name: 'PROS GCC Linter'})
     @subscriptions.add module.exports.linter
     atom.workspace.observeTextEditors (editor) =>

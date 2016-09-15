@@ -22,10 +22,10 @@ module.exports=
     return @baseCommand().concat(['conduct', 'new']).concat(args...)
 
   upgrade: (args...) ->
-    return @baseCommand().concate(['conduct', 'upgrade']).concat(args...)
+    return @baseCommand().concat(['conduct', 'upgrade']).concat(args...)
 
   upload: (args...) ->
-    return @baseCommand().concat(['upload'].concat(args...))
+    return @baseCommand().concat(['flash'].concat(args...))
 
   executeParsed: (cb, command, params) ->
     if '--machine-output' not in command
@@ -52,7 +52,7 @@ module.exports=
     utils.execute cb, @createNew args...
 
   createNewInTerminal: (args...) ->
-    result = utils.executeInConsole @createNew(args...)
+    result = utils.executeInTerminal @createNew(args...)
     console.log result
     return result
 
@@ -60,7 +60,7 @@ module.exports=
     utils.execute cb, @upgrade args...
 
   upgradeInTerminal: (args...) ->
-    utils.executeInConsole @upgrade args...
+    utils.executeInTerminal @upgrade args...
 
   uploadInTerminal: (args...) ->
-    return utils.executeInConsole @upload args...
+    return utils.executeInTerminal @upload args...
