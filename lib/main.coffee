@@ -4,7 +4,7 @@
 {Disposable} = require 'atom'
 fs = require 'fs'
 cli = require './cli'
-{consumeRunInTerminal, consumeDisplayConsole} = require './terminal-utilities'
+{consumeDisplayConsole} = require './terminal-utilities'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
@@ -12,7 +12,6 @@ universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 
 module.exports =
-  consumeRunInTerminal: consumeRunInTerminal
   provideBuilder: provideBuilder
 
   activate: ->

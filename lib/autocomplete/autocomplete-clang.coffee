@@ -77,7 +77,7 @@ module.exports =
       return
     settings = config.settings()
     command = 'clang'
-    editor.selectWordsContainingCursors();
+    editor.selectWordsContainingCursors()
     term = editor.getSelectedText()
     args = @buildGoDeclarationCommandArgs(editor,lang,term)
     options =
@@ -85,12 +85,12 @@ module.exports =
       input: editor.getText()
     new Promise (resolve) =>
       allOutput = []
-      stdout = (output) => allOutput.push(output)
-      stderr = (output) => console.log output
+      stdout = (output) -> allOutput.push(output)
+      stderr = (output) -> console.log output
       exit = (code) =>
         resolve(@handleGoDeclarationResult(editor, {output:allOutput.join("\n"),term:term}, code))
       bufferedProcess = new BufferedProcess({command, args, options, stdout, stderr, exit})
-      bufferedProcess.process.stdin.setEncoding = 'utf-8';
+      bufferedProcess.process.stdin.setEncoding = 'utf-8'
       bufferedProcess.process.stdin.write(editor.getText())
       bufferedProcess.process.stdin.end()
 
@@ -126,10 +126,10 @@ module.exports =
     #   return unless atom.config.get "autocomplete-clang.ignoreClangErrors"
     places = @parseAstDump result['output'], result['term']
     if places.length is 1
-        @goToLocation editor, places.pop()
+      @goToLocation envditor, places.pop()
     else if places.length > 1
-        list = new LocationSelectList(editor, @goToLocation)
-        list.setItems(places)
+      list = new LocationSelectList(editor, @goToLocation)
+      list.setItems(places)
 
   goToLocation: (editor, [file,line,col]) ->
     if file is '<stdin>'

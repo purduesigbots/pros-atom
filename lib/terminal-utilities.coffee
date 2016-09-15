@@ -2,11 +2,6 @@ cp = require 'child_process'
 {Disposable} = require 'atom'
 
 module.exports =
-  consumeRunInTerminal: (service) =>
-    if Boolean(@terminalService)
-      return new Disposable () -> return
-    @terminalService = service
-    return new Disposable () -> @terminalService = null
 
   execute: (cb, command, params = {}) ->
     outBuf = ''
@@ -24,12 +19,6 @@ module.exports =
   executeSync: (command) ->
     proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
     return proc.stdout.read()
-
-  executeInTerminal: (command) =>
-    if Boolean(@terminalService)
-      return @terminalService.run([command.join ' '])
-    else
-      return null
 
   executeInConsole: (command) =>
     if Boolean(@consoleService)

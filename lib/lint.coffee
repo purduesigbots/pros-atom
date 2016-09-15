@@ -12,7 +12,7 @@ module.exports =
 
   activate: () =>
     @grammars = ['C', 'C++']
-    @subscriptions = new CompositeDisposable
+    if not @subscriptions then @subscriptions = new CompositeDisposable
 
   deactivate: () =>
     @subscriptions.dispose()
@@ -92,6 +92,8 @@ module.exports =
     module.exports.lint editor, temp, editor.getPath()
 
   consumeLinter: (indieRegistry) =>
+    # call activate every time in case it hasn't happened yet (usually on first install)
+    module.exports.activate()
     module.exports.linter = indieRegistry.register({name: 'PROS GCC Linter'})
     @subscriptions.add module.exports.linter
     atom.workspace.observeTextEditors (editor) =>

@@ -12,7 +12,7 @@
     "purdue"
   ],
   "repository": "https://github.com/purduesigbots/pros-atom",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
@@ -36,11 +36,6 @@
     "atom-beautify"
   ],
   "consumedServices": {
-    "runInTerminal": {
-      "versions": {
-        "^0.14.5": "consumeRunInTerminal"
-      }
-    },
     "tool-bar": {
       "versions": {
         "^0 || ^1": "consumeToolbar"
