@@ -4,6 +4,7 @@ os = require 'os'
 cp = require 'child_process'
 voucher = require 'voucher'
 {EventEmitter} = require 'events'
+config = require './config'
 
 module.exports =
   provideBuilder: ->
@@ -28,7 +29,7 @@ module.exports =
         return @files.length > 0
 
       settings: () ->
-        args = [ '-j' + atom.config.get('pros.parallel_make_jobs') or 2]
+        args = [ '-j' + config.settings('.').parallel_make_jobs or 2]
 
         if navigator.platform == 'Win32' and !!process.env['PROS_TOOLCHAIN'] and \
            process.env['PROS_TOOLCHAIN'] not in process.env['PATH']
