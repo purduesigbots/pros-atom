@@ -21,22 +21,28 @@ module.exports =
     proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
+  createDiv: (text, classes) ->
+    "<div class=\"#{classes}\">#{text}</div>"
+
   executeInTerminal: (command) ->
     terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
     when panel.className is 'PROSTerminal')[0]
 
     terminal.clearOutput()
-    terminal.appendOutput "<p>#&gt; #{command.join ' '}</p>"
+    terminal.appendOutput \
+      @createDiv "#&gt; #{command.join ' '}", "pros-terminal-command"
 
     if not terminal.isVisible() then terminal.toggle()
 
-    cb = (c, o) ->
-      terminal.appendOutput "<p>Process exited with code #{c}.</p>"
+    cb = (c, o) =>
+      terminal.appendOutput \
+        @createDiv "Process exited with code #{c}", "pros-terminal-terminus"
 
     out = (data) ->
-      terminal.appendOutput "<p>#{data.replace '\n','<br/>'}</p>"
+      terminal.appendOutput "#{data}"
 
-    err = (data) ->
-      terminal.appendOutput "<p>#{data.replace '\n', '<br/>'}</p>"
+    err = (data) =>
+      terminal.appendOutput \
+        @createDiv "#{data}", "pros-terminal-stderr"
 
     @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
