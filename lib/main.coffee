@@ -39,6 +39,8 @@ module.exports =
         'PROS:Register-Project': => @registerProject()
       atom.commands.add 'atom-workspace',
         'PROS:Upload-Project': => @uploadProject()
+      atom.commands.add 'atom-workspace',
+        'PROS:Toggle-Terminal': => @toggleTerminal()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
@@ -61,11 +63,35 @@ module.exports =
   consumeToolbar: (getToolBar) ->
     @toolBar = getToolBar('pros')
 
+    # @toolBar.addButton {
+    #   icon: 'folder-add',
+    #   callback: 'PROS:New-Project',
+    #   tooltip: 'Create a new PROS Project',
+    #   iconset: 'fi'
+    # }
     @toolBar.addButton {
-      icon: 'folder-add',
-      callback: 'PROS:New-Project',
-      tooltip: 'Create a new PROS Project',
+      icon: 'upload',
+      callback: 'PROS:Upload-Project'
+      tooltip: 'Upload PROS project',
       iconset: 'fi'
+    }
+    # @toolBar.addButton {
+    #   icon: 'check',
+    #   callback: 'PROS:Register-Project',
+    #   tooltip: 'Register PROS project',
+    #   iconset: 'fi'
+    # }
+    # @toolBar.addButton {
+    #   icon: 'arrow-circle-up',
+    #   callback: 'PROS:Upgrade-Project',
+    #   tooltip: 'Upgrade existing PROS project',
+    #   iconset: 'fa'
+    # }
+    @toolBar.addButton {
+      icon: 'eye-slash',
+      callback: 'PROS:Toggle-Terminal',
+      tooltip: 'Toggle PROS terminal output visibility'
+      iconset: 'fa'
     }
 
     @toolBar.onDidDestroy => @toolBar = null
