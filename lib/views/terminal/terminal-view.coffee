@@ -5,11 +5,18 @@ module.exports =
     constructor: ->
       super(__dirname)
 
-      # @hideBtn = @element.querySelector '#pros-terminal-hide'
+      @hideBtn = @element.querySelector '#pros-terminal-hide'
+      @hideBtn.onclick = => @hide()
 
-    show: ->
+    show: =>
       @panel ?= atom.workspace.addBottomPanel item: this
       @panel.show()
 
-    clearOutput: ->
-      # TODO: clear content of main text element
+    clearOutput: =>
+      @output = ''
+
+    isVisible: =>
+      @panel.isVisible()
+
+    register: ->
+      super()

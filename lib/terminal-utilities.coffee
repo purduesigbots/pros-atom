@@ -1,5 +1,6 @@
 cp = require 'child_process'
 {Disposable} = require 'atom'
+{TerminalView} = require './views/terminal/terminal-view'
 
 module.exports =
 
@@ -20,16 +21,11 @@ module.exports =
     proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
-  executeInConsole: (command) =>
-    if Boolean(@consoleService)
-      return @consoleService.run
-        identifier: 'pros'
-        heading: 'Hello World!'
-        command: [command.join ' ']
-        options: {}
-    else return null
+  executeInTerminal: (command) =>
+    terminal =
+    if not terminal.isVisible() then terminal.toggle()
 
-  runInConsole: (params...) =>
-    if Boolean(@consoleService)
-      return @consoleService.run params
-    else return null
+    @execute((cb: (code, outBuf) ->
+      terminal.content += outBuf
+      terminal.content += "\nProcess exited with code #{code}"
+    ), command, includeStdErr: true)
