@@ -1,7 +1,5 @@
 {BaseView, View} = require '../base-view'
 {TextEditorView} = require 'atom-space-pen-views'
-fs = require 'fs'
-path = require 'path'
 cli = require '../../cli'
 
 module.exports =
@@ -72,16 +70,18 @@ module.exports =
       directory = @directoryBox.getModel().getText()
       kernel = JSON.parse(@dropdown.options[@dropdown.selectedIndex].value).version
       depot = JSON.parse(@dropdown.options[@dropdown.selectedIndex].value).depot
-      cli.createNewExecute(((code, output) ->
+      cli.createNewExecute(((code, output) =>
         if code is 0
           atom.notifications.addSuccess 'Created a new project', {
             detail: output
             dismissable: true
           }
-          atom.project.addPath directory
-          firstPath = path.join directory, 'src', 'opcontrol.c'
-          fs.exists firstPath, (exists) ->
-            if exists then atom.workspace.open firstPath
+          atom.open({
+            pathsToOpen: [directory],
+            newWindow: true,
+            devMode: atom.inDevMode(),
+            safeMode: atom.inSafeMode()
+          })
         else
           atom.notifications.addError 'Failed to create project', {
             detail: output

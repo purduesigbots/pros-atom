@@ -92,5 +92,4 @@ module.exports =
     @subscriptions.add module.exports.linter
     atom.workspace.observeTextEditors (editor) =>
       @subscriptions.add editor.onDidSave module.exports.lintOnSave
-      # TODO: onDidStopChanging is a little to agressive with updates
       @subscriptions.add editor.onDidStopChanging module.exports.lintOnTheFly

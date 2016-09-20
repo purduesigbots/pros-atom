@@ -1,7 +1,5 @@
 # PROS for Atom
 
-[![GitHub version](https://badge.fury.io/gh/purduesigbots%2Fpros-atom.svg)](https://badge.fury.io/gh/purduesigbots%2Fpros-atom)
-
 PROS is the only open source development environment for the VEX EDR Platform.
 
 This plugin provides support for Atom, the official IDE of the PROS Development Team. For PROS-specific functionality, it interacts with the [PROS CLI](https://github.com/purduesigbots/pros-cli).

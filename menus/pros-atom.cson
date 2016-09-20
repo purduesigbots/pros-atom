@@ -9,14 +9,6 @@
       {
         'label': 'Upgrade a PROS Project'
         'command': 'PROS:Upgrade-Project'
-      },
-      {
-        'label': 'Register a PROS project'
-        'command': 'PROS:Register-Project'
-      },
-      {
-        'label': 'Upload Project'
-        'command': 'PROS:Upload-Project'
       }
     ]
   }
