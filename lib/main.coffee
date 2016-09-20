@@ -44,18 +44,21 @@ module.exports =
       atom.commands.add 'atom-workspace',
         'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace',
-        'PROS:toggle-terminal': => @toggleTerminal()
+        'PROS:Toggle-Terminal': => @toggleTerminal()
       atom.commands.add 'atom-workspace',
         'TEST:list-panels': -> console.log atom.workspace.getBottomPanels()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
 
+      @terminalViewPanel.toggle()
+      @terminalViewPanel.toggle()
+
   consumeLinter: lint.consumeLinter
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal atom.project.getPaths()[0]
+      cli.uploadInTerminal '-f ' + atom.project.getPaths()[0]
 
   newProject: ->
     @newProjectPanel.toggle()
@@ -80,25 +83,25 @@ module.exports =
     }
     @toolBar.addButton {
       icon: 'upload',
-      callback: 'PROS:upload-project'
+      callback: 'PROS:Upload-Project'
       tooltip: 'Upload PROS project',
       iconset: 'fi'
     }
     @toolBar.addButton {
       icon: 'check',
-      callback: 'PROS:register-project',
+      callback: 'PROS:Register-Project',
       tooltip: 'Register PROS project',
       iconset: 'fi'
     }
     @toolBar.addButton {
       icon: 'arrow-circle-up',
-      callback: 'PROS:upgrade-project',
+      callback: 'PROS:Upgrade-Project',
       tooltip: 'Upgrade existing PROS project',
       iconset: 'fa'
     }
     @toolBar.addButton {
       icon: 'eye-slash',
-      callback: 'PROS:toggle-terminal',
+      callback: 'PROS:Toggle-Terminal',
       tooltip: 'Toggle PROS terminal output visibility'
       iconset: 'fa'
     }

@@ -21,11 +21,23 @@ module.exports =
     proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
-  executeInTerminal: (command) =>
-    terminal =
+  executeInTerminal: (command) ->
+    console.log command
+
+    terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
+    when panel.className is 'PROSTerminal')[0]
+
+    terminal.clearOutput()
+
     if not terminal.isVisible() then terminal.toggle()
 
-    @execute((cb: (code, outBuf) ->
-      terminal.content += outBuf
-      terminal.content += "\nProcess exited with code #{code}"
-    ), command, includeStdErr: true)
+    cb = (c, o) ->
+      terminal.appendOutput "<p>Process exited with code #{c}.</p>"
+
+    out = (data) ->
+      terminal.appendOutput "<p>#{data.replace '\n','<br/>'}</p>"
+
+    err = (data) ->
+      terminal.appendOutput "<p>#{data.replace '\n', '<br/>'}</p>"
+
+    @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
