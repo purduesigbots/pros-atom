@@ -9,7 +9,7 @@ module.exports =
       @hideBtn = @element.querySelector '#pros-terminal-hide'
       @hideBtn.onclick = => @hide()
       @clearBtn = @element.querySelector '#pros-terminal-clear-output'
-      @clearBtn.onclicl = => @clearOutput
+      @clearBtn.onclick = => @clearOutput()
 
     show: =>
       @panel ?= atom.workspace.addBottomPanel className: 'PROSTerminal', item: this
