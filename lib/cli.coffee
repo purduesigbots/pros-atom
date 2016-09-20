@@ -4,8 +4,7 @@ utils = require './terminal-utilities'
 module.exports=
   execute: utils.execute
   executeSync: utils.executeSync
-  executeInConsole: utils.executeInConsole
-  runInConsole: utils.runInConsole
+  executeInTerminal: utils.executeInTerminal
 
   fixProsCommand: (command) ->
     if navigator.platform == 'Win32' and !!process.env['PROS_TOOLCHAIN']

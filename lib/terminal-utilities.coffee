@@ -1,5 +1,6 @@
 cp = require 'child_process'
 {Disposable} = require 'atom'
+{TerminalView} = require './views/terminal/terminal-view'
 
 module.exports =
 
@@ -20,16 +21,28 @@ module.exports =
     proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
-  executeInConsole: (command) =>
-    if Boolean(@consoleService)
-      return @consoleService.run
-        identifier: 'pros'
-        heading: 'Hello World!'
-        command: [command.join ' ']
-        options: {}
-    else return null
+  createDiv: (text, classes) ->
+    "<div class=\"#{classes}\">#{text}</div>"
 
-  runInConsole: (params...) =>
-    if Boolean(@consoleService)
-      return @consoleService.run params
-    else return null
+  executeInTerminal: (command) ->
+    terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
+    when panel.className is 'PROSTerminal')[0]
+
+    terminal.clearOutput()
+    terminal.appendOutput \
+      @createDiv "#&gt; #{command.join ' '}", "pros-terminal-command"
+
+    if not terminal.isVisible() then terminal.toggle()
+
+    cb = (c, o) =>
+      terminal.appendOutput \
+        @createDiv "Process exited with code #{c}", "pros-terminal-terminus"
+
+    out = (data) ->
+      terminal.appendOutput "#{data}"
+
+    err = (data) =>
+      terminal.appendOutput \
+        @createDiv "#{data}", "pros-terminal-stderr"
+
+    @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })

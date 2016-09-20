@@ -1,12 +1,52 @@
-.pros-cli {
-  min-width: 250px;
-  font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-  font-weight: 600;
-  font-size: @font-size;
+@import "ui-variables";
 
+atom-panel.bottom .pros-terminal {
   .heading {
     -webkit-user-select: none;
     line-height: 3.0em;
     padding: 0 3px;
+
+    .control-container {
+      float: right;
+      margin-left: @component-padding;
+
+      .btn {
+        color: @text-color-info;
+        margin: 0 1px;
+      }
+
+      .title {
+        float: left;
+      }
+    }
+  }
+
+  .output {
+    height: 300px;
+    color: #fff;
+    font-size: 1.1em;
+    background-color: #000;
+    font-family: monospace;
+    .pros-terminal-command {
+      font-style: italic;
+    }
+    .pros-terminal-stderr {
+      color: red;
+    }
+    .pros-terminal-terminus {
+      font-style: italic;
+    }
+    // p {
+    //   padding: 20px;
+    //   font-family: monospace;
+    // }
+  }
+}
+
+.opaque-hover {
+  transition: opacity 0.2s linear;
+  opacity: 0.6;
+  &:hover {
+    opacity: 1.0;
   }
 }

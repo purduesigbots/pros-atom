@@ -1,6 +1,7 @@
 {NewProjectView} = require './views/new-project/new-project-view'
 {RegisterProjectView} = require './views/register-project/register-project-view'
 {UpgradeProjectView} = require './views/upgrade-project/upgrade-project-view'
+{TerminalView} = require './views/terminal/terminal-view'
 {Disposable} = require 'atom'
 fs = require 'fs'
 cli = require './cli'
@@ -29,6 +30,9 @@ module.exports =
       @upgradeProjectViewProvider = UpgradeProjectView.register
       @upgradeProjectPanel = new UpgradeProjectView
 
+      @terminalViewProvider = TerminalView.register
+      @terminalViewPanel = new TerminalView
+
       # atom.commands.add 'atom-work  space',
       #   'PROS:Toggle-PROS': => @togglePROS()
       atom.commands.add 'atom-workspace',
@@ -47,11 +51,14 @@ module.exports =
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
 
+      @terminalViewPanel.toggle()
+      @terminalViewPanel.toggle()
+
   consumeLinter: lint.consumeLinter
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal atom.project.getPaths()[0]
+      cli.uploadInTerminal '-f ' + atom.project.getPaths()[0]
 
   newProject: ->
     @newProjectPanel.toggle()
@@ -61,6 +68,9 @@ module.exports =
 
   upgradeProject: ->
     @upgradeProjectPanel.toggle()
+
+  toggleTerminal: ->
+    @terminalViewPanel.toggle()
 
   consumeToolbar: (getToolBar) ->
     @toolBar = getToolBar('pros')
