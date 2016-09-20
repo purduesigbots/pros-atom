@@ -22,12 +22,11 @@ module.exports =
     return proc.stdout.read()
 
   executeInTerminal: (command) ->
-    console.log command
-
     terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
     when panel.className is 'PROSTerminal')[0]
 
     terminal.clearOutput()
+    terminal.appendOutput "<p>#&gt; #{command.join ' '}</p>"
 
     if not terminal.isVisible() then terminal.toggle()
 
