@@ -10,6 +10,10 @@
         'label': 'Upgrade a PROS Project'
         'command': 'PROS:Upgrade-Project'
       }
+      {
+        'label': 'Toggle PROS functionality'
+        'command': 'PROS:Toggle-PROS'
+      }
     ]
   }
 ]
