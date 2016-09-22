@@ -11,6 +11,10 @@
         'command': 'PROS:Upgrade-Project'
       }
       {
+        'label': 'Disable PROS-Atom Google Analytics'
+        'command': 'PROS:Toggle-GA'
+      }
+      {
         'label': 'Toggle PROS functionality'
         'command': 'PROS:Toggle-PROS'
       }
