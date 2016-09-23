@@ -32,7 +32,6 @@
     "tool-bar",
     "tool-bar-main",
     "build",
-    "platformio-ide-terminal",
     "atom-beautify"
   ],
   "consumedServices": {
