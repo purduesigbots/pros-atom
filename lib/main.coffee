@@ -56,7 +56,9 @@ module.exports =
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal '-f ' + atom.project.getPaths()[0]
+      cli.uploadInTerminal '-f "' + \
+        (atom.project.relativizePath(atom.workspace.getActiveTextEditor().getPath())[0] or \
+          atom.project.getPaths()[0]) + '"'
 
   newProject: ->
     @newProjectPanel.toggle()
