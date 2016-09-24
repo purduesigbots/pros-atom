@@ -18,3 +18,14 @@ developer options wouldn't be used.
  - https://github.com/purduesigbots/pros-cli
 
 ## Live Installing PROScli
+With the CLI Repository cloned, open a console in that directory and run `pip3 install --editable .`
+You should now be able to run `pros` from within the console.
+
+## Link pros-atom to Atom
+With the pros-atom repository cloned, open a console in that directory and run either:
+ - `apm link -d .`
+ - `apm link .`
+The `-d` option installs the pros plugin in development mode, so that it can only be opened when explicitly loaded. See Atom documentation for more details.
+
+## Running Atom for the first time with PROS
+You will need to redownload the required node modules before the linked PROS plugin will work as intended. To do this, open the pros-atom directory in Atom and run the "Update Package Dependencies" command by pressing Ctrl+Shift+P and typing the command.

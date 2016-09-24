@@ -27,7 +27,8 @@ module.exports =
 
     show: ->
       super
-      @directoryDropdown.appendChild(@createOption path, path) for path in atom.project.getPaths()
+      @directoryDropdown.appendChild(@createOption path, path) \
+        for path in atom.project.getPaths()
       @templateDropdown.appendChild @createOption 'latest', 'Automatically select latest'
       @templateDropdown.appendChild @createOption null, 'Loading...'
       cli.getTemplates ((code, result) =>
@@ -41,17 +42,19 @@ module.exports =
         ), '--offline-only'
 
     cancel: ->
-      @directoryDropdown.removeChild @directoryDropdown.firstChild while @directoryDropdown.firstChild
-      @templateDropdown.removeChild @templateDropdown.firstChild while @templateDropdown.firstChild
+      @directoryDropdown.removeChild @directoryDropdown.firstChild \
+        while @directoryDropdown.firstChild
+      @templateDropdown.removeChild @templateDropdown.firstChild \
+        while @templateDropdown.firstChild
       @hide()
 
     register: ->
       directory = @directoryDropdown.options[@directoryDropdown.selectedIndex].value
       kernel = @templateDropdown.options[@templateDropdown.selectedIndex]
       console.log directory
-      console.log kernel
+      console.log kernel.value
       cli.execute(
-        ((code, output) =>
+        ((code, output) ->
           if code is 0
             atom.notifications.addSuccess 'Registered a project', {
               detail: output
@@ -63,7 +66,8 @@ module.exports =
               dismissable: true
             }
           console.log output
+          console.log "Error code was #{code}"
           ),
-        cli.baseCommand('conduct', 'register', '"' + directory + '"', kernel))
+        cli.baseCommand('conduct', 'register', '"' + directory + '"', kernel.value))
       # cli.createNewInTerminal('"' + directory + '"', kernel, depot)
       @cancel()
