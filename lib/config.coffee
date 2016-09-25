@@ -86,8 +86,8 @@ module.exports =
         includeNonDoxygenCommentsAsDocumentation:
           type: 'boolean'
           default: 'true'
-    googleanalytics:
-      # title: 'Google Analytics'
+    googleAnalytics:
+      title: 'Google Analytics'
       type: 'object'
       properties:
         enabled:

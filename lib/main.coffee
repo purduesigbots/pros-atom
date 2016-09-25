@@ -23,15 +23,17 @@ module.exports =
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
       # Generate a new client ID if needed
-      if atom.config.get 'pros.googleanalytics.enabled' and\
-      atom.config.get 'pros.googleanalytics.cid' is ''
-        atom.config.set 'pros.google-analytics.cid', GA.generateUUID()
+      if atom.config.get 'pros.googleAnalytics.enabled' and\
+      atom.config.get 'pros.googleAnalytics.cid' is ''
+        atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       # Begin client session
-      if atom.config.get 'pros.googleanalytics.enabled'
+      if atom.config.get 'pros.googleAnalytics.enabled'
         GA.sendData()
       # Watch config to make sure we start or end sessions as needed
-      atom.config.observe 'pros.googleanalytics.enabled', (value) ->
+      atom.config.observe 'pros.googleAnalytics.enabled', (value) ->
         if value
+          if atom.config.get 'pros.googleAnalytics.cid' is ''
+            atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
           GA.sendData()
         else
           GA.sendData sessionControl = 'end'
@@ -73,7 +75,7 @@ module.exports =
 
   deactivate: ->
     # End client session
-    if atom.config.get 'pros.googleanalytics.enabled'
+    if atom.config.get 'pros.googleAnalytics.enabled'
       GA.sendData sessionControl = 'end'
 
   consumeLinter: lint.consumeLinter
@@ -109,8 +111,8 @@ module.exports =
       @PROSstatus = true
 
   toggleGA: ->
-    atom.config.set 'pros.googleanalytics.enabled', \
-    not atom.config.get 'pros.googleanalytics.enabled'
+    atom.config.set 'pros.googleAnalytics.enabled', \
+    not atom.config.get 'pros.googleAnalytics.enabled'
 
   consumeToolbar: (getToolBar) =>
     @toolBar = getToolBar('pros')
