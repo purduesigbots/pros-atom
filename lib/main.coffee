@@ -22,11 +22,19 @@ module.exports =
     require('atom-package-deps').install('pros').then () =>
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
-      # TODO: if it isn't already set...
-      atom.config.set 'pros.google-analytics.cid', GA.generateUUID()
-      GA.sendData() # begin client session
-      # TODO: observe config for changes to pros.google-analytics.enabled, and
-      #       start or end a session based on that.
+      # Generate a new client ID if needed
+      if atom.config.get 'pros.googleanalytics.enabled' and\
+      atom.config.get 'pros.googleanalytics.cid' is ''
+        atom.config.set 'pros.google-analytics.cid', GA.generateUUID()
+      # Begin client session
+      if atom.config.get 'pros.googleanalytics.enabled'
+        GA.sendData()
+      # Watch config to make sure we start or end sessions as needed
+      atom.config.observe 'pros.googleanalytics.enabled', (value) ->
+        if value
+          GA.sendData()
+        else
+          GA.sendData sessionControl = 'end'
       lint.activate()
       autocomplete.activate()
       @newProjectViewProvider = NewProjectView.register
@@ -61,9 +69,12 @@ module.exports =
 
       @terminalViewPanel.toggle()
       @terminalViewPanel.toggle()
+      console.log universalConfig.filterConfig config.config, 'atom'
 
   deactivate: ->
-    GA.sendData sessionControl = 'end'
+    # End client session
+    if atom.config.get 'pros.googleanalytics.enabled'
+      GA.sendData sessionControl = 'end'
 
   consumeLinter: lint.consumeLinter
 
@@ -98,9 +109,8 @@ module.exports =
       @PROSstatus = true
 
   toggleGA: ->
-    # TODO: config stuff
-    atom.config.set 'pros.google-analytics.enabled', \
-    not atom.config.get 'pros.google-analytics.enabled'
+    atom.config.set 'pros.googleanalytics.enabled', \
+    not atom.config.get 'pros.googleanalytics.enabled'
 
   consumeToolbar: (getToolBar) =>
     @toolBar = getToolBar('pros')
@@ -116,19 +126,3 @@ module.exports =
 
 
   config: universalConfig.filterConfig config.config, 'atom'
-    # 'google-analytics':
-    #   'enabled':
-    #     title: 'Google Analytics'
-    #     description: \
-    #     'If set to \'true,\' you help us to understand and better cater to our'+\
-    #     'user-base by sending us information about the size, relative geograph'+\
-    #     'ic area, and general activities of the people using PROS.'
-    #     type: 'boolean'
-    #     default: true
-    #   'cid':
-    #     title: 'Google Analytics client ID'
-    #     description: \
-    #     'Used when making requests to the GA API.
-    #     Please do not change this value unless you have \'enabled\' set to \'false\''
-    #     type: 'string'
-    #     default: ''

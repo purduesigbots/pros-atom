@@ -86,6 +86,26 @@ module.exports =
         includeNonDoxygenCommentsAsDocumentation:
           type: 'boolean'
           default: 'true'
+    googleanalytics:
+      # title: 'Google Analytics'
+      type: 'object'
+      properties:
+        enabled:
+          title: 'Enable Google Analytics'
+          description: \
+          'If set to \'true,\' you help us to understand and better cater to our'+\
+          'user-base by sending us information about the size, relative geograph'+\
+          'ic area, and general activities of the people using PROS.'
+          type: 'boolean'
+          default: true
+        cid:
+          title: 'Google Analytics client ID'
+          description: \
+          'Used when making requests to the GA API.
+          Please do not change this value unless you have \'enabled\' set to \'false\''
+          type: 'string'
+          default: ''
+
     lint:
       type: 'object'
       properties:

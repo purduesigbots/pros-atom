@@ -25,7 +25,7 @@ module.exports =
         t: 'pageview'
         cd: 'PROS-atom'
         tid: 'UA-84548828-2'
-        cid: @generateUUID() # atom.config.get 'pros.google-analytics.cid'
+        cid: atom.config.get 'pros.google-analytics.cid'
       }
       extend params,
         sc: sessionControl
