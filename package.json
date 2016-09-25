@@ -1,7 +1,7 @@
 {
   "name": "pros",
   "main": "./lib/main",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "description": "Provides integration with the PROS ecosystem",
   "keywords": [
     "pros",
@@ -32,7 +32,6 @@
     "tool-bar",
     "tool-bar-main",
     "build",
-    "platformio-ide-terminal",
     "atom-beautify"
   ],
   "consumedServices": {
