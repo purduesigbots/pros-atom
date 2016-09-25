@@ -23,15 +23,15 @@ module.exports =
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
       # Generate a new client ID if needed
-      if atom.config.get 'pros.googleAnalytics.enabled' and\
-      atom.config.get 'pros.googleAnalytics.cid' is ''
+      # atom.config.get 'pros.googleAnalytics.enabled' and\
+      if atom.config.get 'pros.googleAnalytics.cid' is ''
         atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       # Begin client session
       if atom.config.get 'pros.googleAnalytics.enabled'
         GA.sendData()
       # Watch config to make sure we start or end sessions as needed
-      atom.config.observe 'pros.googleAnalytics.enabled', (value) ->
-        if value
+      atom.config.onDidChange 'pros.googleAnalytics.enabled', ->
+        if atom.config.get 'pros.googleAnalytics.enabled'
           if atom.config.get 'pros.googleAnalytics.cid' is ''
             atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
           GA.sendData()

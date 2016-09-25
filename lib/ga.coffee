@@ -22,8 +22,9 @@ module.exports =
     @sendData: (sessionControl = 'start') ->
       params = {
         v: 1
-        t: 'pageview'
-        cd: 'PROS-atom'
+        t: 'event'
+        ec: 'session'
+        ea: "#{sessionControl}_session"
         tid: 'UA-84548828-2'
         cid: atom.config.get 'pros.google-analytics.cid'
       }
