@@ -6,7 +6,9 @@ module.exports =
 
   execute: (cb, command, params = {}) ->
     outBuf = ''
-    proc = cp.exec command.join ' ', { 'encoding': 'utf-8' }
+    comm = "export LC_ALL=en_US.utf-8;export LANG=en_US.utf-8;"
+    comm = comm.concat(command.join ' ')
+    proc = cp.exec comm, { 'encoding': 'utf-8' }
     proc.stderr.on 'data', (data) ->
       if params.includeStdErr then outBuf += data
       params?.onstderr?(data)
