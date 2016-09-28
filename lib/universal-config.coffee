@@ -14,8 +14,8 @@ handlers =
   project: (config, identifier, options) ->
     config = module.exports.filterConfig config, 'project'
     obj = {}
-    project = atom.project.relativizePath(editor.getPath())
     editor = atom.workspace.getActiveTextEditor()
+    project = atom.project.relativizePath(editor.getPath())
     return unless editor
     if !!!project
       return obj
