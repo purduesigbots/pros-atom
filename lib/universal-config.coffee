@@ -14,13 +14,11 @@ handlers =
   project: (config, identifier, options) ->
     config = module.exports.filterConfig config, 'project'
     obj = {}
-    projects = atom.project.getPaths()
     editor = atom.workspace.getActiveTextEditor()
-    return unless editor
-    project = projects.filter (project) -> ~editor.getPath().indexOf project
-    if project.length != 1
+    project = atom.project.relativizePath(editor.getPath())[0]
+    if !!!project
       return obj
-    file = path.join project[0], (options?.project?.filename or '.atom-config')
+    file = path.join project, (options?.project?.filename or '.atom-config')
     try
       fs.accessSync file, fs.F_OK | fs.R_OK
     catch e  # file doesn't exist or some other exception... just ignore
