@@ -16,7 +16,6 @@ handlers =
     obj = {}
     editor = atom.workspace.getActiveTextEditor()
     project = atom.project.relativizePath(editor.getPath())[0]
-    return unless editor
     if !!!project
       return obj
     file = path.join project, (options?.project?.filename or '.atom-config')
