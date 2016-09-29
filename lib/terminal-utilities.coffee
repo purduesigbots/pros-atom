@@ -6,9 +6,11 @@ module.exports =
 
   execute: (cb, command, params = {}) ->
     outBuf = ''
-    comm = "export LC_ALL=en_US.utf-8;export LANG=en_US.utf-8;"
-    comm = comm.concat(command.join ' ')
-    proc = cp.exec comm, { 'encoding': 'utf-8' }
+    cmd = ''
+    if navigator.platform != 'Win32'
+      cmd = cmd.concat "export LC_ALL=en_US.utf-8;export LANG=en_US.utf-8;"
+    cmd = cmd.concat command.join ' '
+    proc = cp.exec cmd, { 'encoding': 'utf-8' }
     proc.stderr.on 'data', (data) ->
       if params.includeStdErr then outBuf += data
       params?.onstderr?(data)
@@ -20,7 +22,11 @@ module.exports =
     return proc
 
   executeSync: (command) ->
-    proc = cp.execSync command.join ' ', { 'encoding': 'utf-8' }
+    cmd = ''
+    if navigator.platform != 'Win32'
+      cmd = cmd.concat "export LC_ALL=en_US.utf-8;export LANG=en_US.utf-8;"
+    cmd = cmd.concat command.join ' '
+    proc = cp.execSync cmd, { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
   createDiv: (text, classes) ->
