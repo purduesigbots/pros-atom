@@ -66,6 +66,8 @@ module.exports =
           args.push "-I\"#{path.join cwd, include}\""
         if settings.lint.suppress_warnings then args.push '-w'
         args.push "\"#{lintable_file}\""
+        temp = (require 'tempfile') path.extname editor.getPath()
+        args.push "-o #{temp}"
         args = args.filter Boolean
         terminal.execute handleLintOutput, [command].concat(args), {includeStdErr: true}
       else
