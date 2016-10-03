@@ -31,8 +31,7 @@
     "linter",
     "tool-bar",
     "tool-bar-main",
-    "build",
-    "atom-beautify"
+    "build"
   ],
   "consumedServices": {
     "tool-bar": {
