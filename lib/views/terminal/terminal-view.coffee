@@ -8,6 +8,8 @@ module.exports =
       @output = ''
       @hideBtn = @element.querySelector '#pros-terminal-hide'
       @hideBtn.onclick = => @hide()
+      @cancelBtn = @element.querySelector '#pros-terminal-cancel-command'
+      @cancelBtn.onclick = => @cancelCmd()
       @clearBtn = @element.querySelector '#pros-terminal-clear-output'
       @clearBtn.onclick = => @clearOutput()
 
@@ -16,7 +18,10 @@ module.exports =
       @panel.show()
 
     updateOutput: =>
-      @element.querySelector('.output').innerHTML = @output
+      out = @element.querySelector '.panel-container'
+      out.innerHTML = @output
+      out.scrollTop = out.scrollHeight
+
 
     appendOutput: (data) =>
       @output += data
@@ -25,6 +30,9 @@ module.exports =
     clearOutput: =>
       @output = ''
       @updateOutput()
+
+    cancelCmd: ->
+      # TODO: add ability to cancel command
 
     isVisible: =>
       @panel.isVisible()
