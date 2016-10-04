@@ -45,6 +45,9 @@ module.exports =
         'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace',
         'PROS:Toggle-Terminal': => @toggleTerminal()
+      # name subject to change, this just seems the most descriptive
+      atom.commands.add 'atom-workspace',
+        'PROS:Open-Cortex': => @openCortex()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
@@ -71,6 +74,9 @@ module.exports =
 
   toggleTerminal: ->
     @terminalViewPanel.toggle()
+
+  openCortex: ->
+    cli.cortexInTerminal()
 
   consumeToolbar: (getToolBar) ->
     @toolBar = getToolBar('pros')
@@ -104,6 +110,11 @@ module.exports =
       callback: 'PROS:Toggle-Terminal',
       tooltip: 'Toggle PROS terminal output visibility'
       iconset: 'fa'
+    }
+    @toolBar.addButton {
+      icon: 'circuit-board',
+      callback: 'PROS:Open-Cortex',
+      tooltip: 'Open cortex serial output'
     }
 
     @toolBar.onDidDestroy => @toolBar = null
