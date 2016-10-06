@@ -44,7 +44,7 @@ module.exports =
 
     cb = (c, o) =>
       terminal.appendOutput \
-        @createDiv "Process exited with code #{c}", "pros-terminal-terminus"
+        @createDiv "Process exited with code #{c ? 0}", "pros-terminal-terminus"
 
     out = (data) ->
       terminal.appendOutput "#{data}"
@@ -53,4 +53,7 @@ module.exports =
       terminal.appendOutput \
         @createDiv "#{data}", "pros-terminal-stderr"
 
-    @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
+    proc = @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
+    console.log terminal.cancelBtn
+    terminal.cancelBtn.onclick = ->
+      proc.kill 'SIGINT'

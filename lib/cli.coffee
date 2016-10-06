@@ -26,6 +26,9 @@ module.exports=
   upload: (args...) ->
     return @baseCommand().concat(['flash'].concat(args...))
 
+  terminal: (args...) ->
+    return @baseCommand().concat(['terminal'].concat(args...))
+
   executeParsed: (cb, command, params) ->
     if '--machine-output' not in command
       command.push '--machine-output'
@@ -63,3 +66,6 @@ module.exports=
 
   uploadInTerminal: (args...) ->
     return utils.executeInTerminal @upload args...
+
+  cortexInTerminal: (args...) ->
+    return utils.executeInTerminal @terminal args...
