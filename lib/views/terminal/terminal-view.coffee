@@ -11,6 +11,7 @@ module.exports =
       @cancelBtn = @element.querySelector '#pros-terminal-cancel-command'
       @clearBtn = @element.querySelector '#pros-terminal-clear-output'
       @clearBtn.onclick = => @clearOutput()
+      @element.querySelector '.output'
 
     show: =>
       @panel ?= atom.workspace.addBottomPanel className: 'PROSTerminal', item: this
