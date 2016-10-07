@@ -24,6 +24,7 @@ atom-panel.bottom .pros-terminal {
   }
   pre .output {
     margin: auto;
+    padding-left: 5px;
   }
 
   .output {
@@ -48,6 +49,35 @@ atom-panel.bottom .pros-terminal {
     //   padding: 20px;
     //   font-family: monospace;
     // }
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 3px;
+  padding-left: 0;
+  padding-right: 10px;
+  font-family: monospace;
+  display: inline-flex;
+  .PS1 {
+    float: left;
+    height: 100%;
+    flex-grow: 0;
+    padding: 10px;
+    margin: 0;
+    background-color: #000;
+    border-radius: 5px 0 0 5px;
+  }
+  .text {
+    //width: 100%;
+    flex-grow: 15;
+    float: right;
+    color: #fff;
+    background-color: #000;
+    border-style: none;
+    border-radius: 0 5px 5px 0;
+    overflow-x: scroll; // In case the command is way too long
+    padding-left: 5px;
   }
 }
 

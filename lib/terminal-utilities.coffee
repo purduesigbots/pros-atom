@@ -54,6 +54,5 @@ module.exports =
         @createDiv "#{data}", "pros-terminal-stderr"
 
     proc = @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
-    console.log terminal.cancelBtn
     terminal.cancelBtn.onclick = ->
       proc.kill 'SIGINT'

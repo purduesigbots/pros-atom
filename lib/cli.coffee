@@ -42,7 +42,6 @@ module.exports=
     return JSON.parse e for e in utils.executeSync(command).split(/\r?\n/)
     .filter(Boolean)
 
-
   getTemplates: (cb, args...) ->
     @executeParsed cb, @lstemplate(args...), {}
 
@@ -69,3 +68,7 @@ module.exports=
 
   cortexInTerminal: (args...) ->
     return utils.executeInTerminal @terminal args...
+
+  # wrapper function for scoping reasons
+  runInTerminal: (command) ->
+    return utils.executeInTerminal command.split ' '

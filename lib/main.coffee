@@ -32,6 +32,8 @@ module.exports =
 
       @terminalViewProvider = TerminalView.register
       @terminalViewPanel = new TerminalView
+      @terminalViewPanel.emitter.on 'stdin',
+        (command) -> if command isnt '' then cli.runInTerminal command
 
       # atom.commands.add 'atom-work  space',
       #   'PROS:Toggle-PROS': => @togglePROS()

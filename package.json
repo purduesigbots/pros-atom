@@ -22,6 +22,7 @@
     "atom-package-deps": "^4.0.0",
     "clang-flags": "0.2.2",
     "command-exists": "^1.0.0",
+    "event-kit": "^2.1.0",
     "fs-extra": "^0.26.1",
     "split-string": "^0.1.0",
     "tempfile": "^1.1.0",
