@@ -6,6 +6,7 @@
 fs = require 'fs'
 cli = require './cli'
 {consumeDisplayConsole} = require './terminal-utilities'
+{addButtons} = require './pros-buttons'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
@@ -33,8 +34,6 @@ module.exports =
       @terminalViewProvider = TerminalView.register
       @terminalViewPanel = new TerminalView
 
-      # atom.commands.add 'atom-work  space',
-      #   'PROS:Toggle-PROS': => @togglePROS()
       atom.commands.add 'atom-workspace',
         'PROS:New-Project': => @newProject()
       atom.commands.add 'atom-workspace',
@@ -45,6 +44,8 @@ module.exports =
         'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace',
         'PROS:Toggle-Terminal': => @toggleTerminal()
+      atom.commands.add 'atom-workspace',
+        'PROS:Toggle-PROS': => @togglePROS()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
@@ -56,9 +57,7 @@ module.exports =
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal '-f "' + \
-        (atom.project.relativizePath(atom.workspace.getActiveTextEditor().getPath())[0] or \
-          atom.project.getPaths()[0]) + '"'
+      cli.uploadInTerminal '-f ' + atom.project.getPaths()[0]
 
   newProject: ->
     @newProjectPanel.toggle()
@@ -72,46 +71,36 @@ module.exports =
   toggleTerminal: ->
     @terminalViewPanel.toggle()
 
-  consumeToolbar: (getToolBar) ->
+  togglePROS: =>
+    if @PROSstatus or not @PROSstatus?
+      @toolBar.removeItems()
+      lint.deactivate()
+      autocomplete.deactivate()
+      @PROSstatus = false
+    else
+      addButtons @toolBar
+      lint.activate()
+      autocomplete.activate()
+      @PROSstatus = true
+
+  consumeToolbar: (getToolBar) =>
     @toolBar = getToolBar('pros')
 
-    # @toolBar.addButton {
-    #   icon: 'folder-add',
-    #   callback: 'PROS:New-Project',
-    #   tooltip: 'Create a new PROS Project',
-    #   iconset: 'fi'
-    # }
-    @toolBar.addButton {
-      icon: 'upload',
-      callback: 'PROS:Upload-Project'
-      tooltip: 'Upload PROS project',
-      iconset: 'fi'
-    }
-    # @toolBar.addButton {
-    #   icon: 'check',
-    #   callback: 'PROS:Register-Project',
-    #   tooltip: 'Register PROS project',
-    #   iconset: 'fi'
-    # }
-    # @toolBar.addButton {
-    #   icon: 'arrow-circle-up',
-    #   callback: 'PROS:Upgrade-Project',
-    #   tooltip: 'Upgrade existing PROS project',
-    #   iconset: 'fa'
-    # }
-    @toolBar.addButton {
-      icon: 'eye-slash',
-      callback: 'PROS:Toggle-Terminal',
-      tooltip: 'Toggle PROS terminal output visibility'
-      iconset: 'fa'
-    }
+    addButtons @toolBar
 
     @toolBar.onDidDestroy => @toolBar = null
 
   autocompleteProvider: ->
     autocomplete.provide()
 
-  consumeStatusBar: ->
+  consumeStatusBar: (statusBar) =>
+    func = => @togglePROS()
+    btn = document.createElement 'button'
+    btn.setAttribute 'class', 'btn btn-default fa fa-power-off'
+    btn.onclick = ->
+      console.log 'click'
+      func()
+    statusBar.addLeftTile item: btn, priority: -10
 
 
   config: universalConfig.filterConfig config.config, 'atom'

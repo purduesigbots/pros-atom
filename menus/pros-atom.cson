@@ -18,6 +18,10 @@
         'label': 'Upload Project'
         'command': 'PROS:Upload-Project'
       }
+      {
+        'label': 'Toggle PROS functionality'
+        'command': 'PROS:Toggle-PROS'
+      }
     ]
   }
 ]
