@@ -1,4 +1,3 @@
-
 {NewProjectView} = require './views/new-project/new-project-view'
 {RegisterProjectView} = require './views/register-project/register-project-view'
 {UpgradeProjectView} = require './views/upgrade-project/upgrade-project-view'
@@ -94,7 +93,14 @@ module.exports =
   autocompleteProvider: ->
     autocomplete.provide()
 
-  consumeStatusBar: ->
+  consumeStatusBar: (statusBar) =>
+    func = => @togglePROS()
+    btn = document.createElement 'button'
+    btn.setAttribute 'class', 'btn btn-default fa fa-power-off'
+    btn.onclick = ->
+      console.log 'click'
+      func()
+    statusBar.addLeftTile item: btn, priority: -10
 
 
   config: universalConfig.filterConfig config.config, 'atom'

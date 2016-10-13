@@ -1,31 +1,10 @@
 module.exports =
   addButtons: (toolBar) ->
     toolBar.addButton {
-      icon: 'folder-add',
-      callback: 'PROS:New-Project',
-      tooltip: 'Create a new PROS Project',
-      iconset: 'fi',
-      priority: 0
-    }
-    toolBar.addButton {
       icon: 'upload',
       callback: 'PROS:Upload-Project'
       tooltip: 'Upload PROS project',
       iconset: 'fi',
-      priority: 0
-    }
-    toolBar.addButton {
-      icon: 'check',
-      callback: 'PROS:Register-Project',
-      tooltip: 'Register PROS project',
-      iconset: 'fi',
-      priority: 0
-    }
-    toolBar.addButton {
-      icon: 'arrow-circle-up',
-      callback: 'PROS:Upgrade-Project',
-      tooltip: 'Upgrade existing PROS project',
-      iconset: 'fa',
       priority: 0
     }
     toolBar.addButton {
@@ -35,7 +14,14 @@ module.exports =
       iconset: 'fa',
       priority: 0
     }
-    # separate power button from the rest of the toolbar to reduce likelihood of it being hit by accident
+    toolBar.addButton {
+      icon: 'circuit-board',
+      callback: 'PROS:Open-Cortex',
+      tooltip: 'Open cortex serial output'
+    }
+
+    # separate power button from the rest of the toolbar to reduce likelihood of
+    # it being hit by accident
     # (inb4 angry user report)
     toolBar.addSpacer priority: 0
     toolBar.addButton {
