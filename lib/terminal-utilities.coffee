@@ -2,7 +2,16 @@ cp = require 'child_process'
 {Disposable} = require 'atom'
 {TerminalView} = require './views/terminal/terminal-view'
 
+terminalService = null
+currentTerminal = null
 module.exports =
+  statusBar: null
+  consumeRunInTerminal: (service) =>
+    if Boolean terminalService
+      return new Disposable () -> return
+    terminalService = service
+    console.log terminalService
+    return new Disposable () -> terminalService = null
 
   execute: (cb, command, params = {}) ->
     outBuf = ''
@@ -29,30 +38,18 @@ module.exports =
     proc = cp.execSync cmd, { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
-  createDiv: (text, classes) ->
-    "<div class=\"#{classes}\">#{text}</div>"
-
   executeInTerminal: (command) ->
-    terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
-    when panel.className is 'PROSTerminal')[0]
-
-    terminal.clearOutput()
-    terminal.appendOutput \
-      @createDiv "#&gt; #{command.join ' '}", "pros-terminal-command"
-
-    if not terminal.isVisible() then terminal.toggle()
-
-    cb = (c, o) =>
-      terminal.appendOutput \
-        @createDiv "Process exited with code #{c ? 0}", "pros-terminal-terminus"
-
-    out = (data) ->
-      terminal.appendOutput "#{data}"
-
-    err = (data) =>
-      terminal.appendOutput \
-        @createDiv "#{data}", "pros-terminal-stderr"
-
-    proc = @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
-    terminal.cancelBtn.onclick = ->
-      proc.kill 'SIGINT'
+    # terminalService.destroyTerminalView currentTerminal
+    if Boolean(terminalService)
+      if Boolean currentTerminal
+        currentTerminal.insertSelection '\x03'
+        currentTerminal.insertSelection if navigator.platform is 'Win32' then 'cls' else 'clear'
+        currentTerminal.insertSelection command.join ' '
+        currentTerminal.focus()
+      else
+        currentTerminal = terminalService.run([command.join ' '])[0].spacePenView
+        currentTerminal.statusIcon.style.color = '#cca352'
+        currentTerminal.statusIcon.updateName 'PROS CLI'
+      return currentTerminal
+    else
+      return null

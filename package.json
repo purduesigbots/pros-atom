@@ -32,7 +32,8 @@
     "linter",
     "tool-bar",
     "tool-bar-main",
-    "build"
+    "build",
+    "platformio-ide-terminal"
   ],
   "consumedServices": {
     "tool-bar": {
@@ -48,6 +49,11 @@
     "status-bar": {
       "versions": {
         "1.0.0": "consumeStatusBar"
+      }
+    },
+    "runInTerminal": {
+      "versions": {
+        "^0.14.0": "consumeRunInTerminal"
       }
     }
   },

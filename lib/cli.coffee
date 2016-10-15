@@ -66,7 +66,7 @@ module.exports=
   uploadInTerminal: (args...) ->
     return utils.executeInTerminal @upload args...
 
-  cortexInTerminal: (args...) ->
+  serialInTerminal: (args...) ->
     return utils.executeInTerminal @terminal args...
 
   # wrapper function for scoping reasons
