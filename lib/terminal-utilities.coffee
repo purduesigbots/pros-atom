@@ -4,9 +4,9 @@ cp = require 'child_process'
 
 terminalService = null
 currentTerminal = null
+
 module.exports =
-  statusBar: null
-  consumeRunInTerminal: (service) =>
+  consumeRunInTerminal: (service) ->
     if Boolean terminalService
       return new Disposable () -> return
     terminalService = service
@@ -39,10 +39,12 @@ module.exports =
     return proc.stdout.read()
 
   executeInTerminal: (command) ->
-    # terminalService.destroyTerminalView currentTerminal
     if Boolean(terminalService)
       if Boolean currentTerminal
         currentTerminal.insertSelection '\x03'
+        currentTerminal.insertSelection if navigator.platform is 'Win32' then 'cls' else 'clear'
+        # Run clear twice in case there wasn't a command running previously.
+        # Interrupt control character will screw the first clear
         currentTerminal.insertSelection if navigator.platform is 'Win32' then 'cls' else 'clear'
         currentTerminal.insertSelection command.join ' '
         currentTerminal.focus()
