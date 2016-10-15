@@ -2,7 +2,16 @@ cp = require 'child_process'
 {Disposable} = require 'atom'
 {TerminalView} = require './views/terminal/terminal-view'
 
+terminalService = null
+currentTerminal = null
+
 module.exports =
+  consumeRunInTerminal: (service) ->
+    if Boolean terminalService
+      return new Disposable () -> return
+    terminalService = service
+    console.log terminalService
+    return new Disposable () -> terminalService = null
 
   execute: (cb, command, params = {}) ->
     outBuf = ''
@@ -29,28 +38,25 @@ module.exports =
     proc = cp.execSync cmd, { 'encoding': 'utf-8' }
     return proc.stdout.read()
 
-  createDiv: (text, classes) ->
-    "<div class=\"#{classes}\">#{text}</div>"
-
   executeInTerminal: (command) ->
-    terminal = (panel.item for panel in atom.workspace.getBottomPanels()\
-    when panel.className is 'PROSTerminal')[0]
-
-    terminal.clearOutput()
-    terminal.appendOutput \
-      @createDiv "#&gt; #{command.join ' '}", "pros-terminal-command"
-
-    if not terminal.isVisible() then terminal.toggle()
-
-    cb = (c, o) =>
-      terminal.appendOutput \
-        @createDiv "Process exited with code #{c}", "pros-terminal-terminus"
-
-    out = (data) ->
-      terminal.appendOutput "#{data}"
-
-    err = (data) =>
-      terminal.appendOutput \
-        @createDiv "#{data}", "pros-terminal-stderr"
-
-    @execute(cb, command, { includeStdErr: true, onstdout: out, onstderr: err })
+    wait = (ms) ->
+      start = new Date().getTime()
+      for num in [0...1e7]
+        if ((new Date().getTime() - start) > ms)
+          break
+    if Boolean(terminalService)
+      if Boolean currentTerminal
+        currentTerminal.insertSelection '\x03'
+        wait 75 # hard code waits to allow commands to be executed
+        currentTerminal.insertSelection(if navigator.platform is 'Win32' then 'cls' else 'clear')
+        wait 75
+        currentTerminal.insertSelection command.join ' '
+        currentTerminal.focus()
+      else
+        currentTerminal = terminalService.run([command.join ' '])[0].spacePenView
+        currentTerminal.statusIcon.style.color = '#cca352'
+        currentTerminal.statusIcon.updateName 'PROS CLI'
+        currentTerminal.panel.onDidDestroy () -> currentTerminal = null
+      return currentTerminal
+    else
+      return null

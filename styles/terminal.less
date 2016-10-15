@@ -5,10 +5,12 @@ atom-panel.bottom .pros-terminal {
     -webkit-user-select: none;
     line-height: 3.0em;
     padding: 0 3px;
+    margin: 0 0 1em 1em;
 
     .control-container {
       float: right;
       margin-left: @component-padding;
+      clear: right;
 
       .btn {
         color: @text-color-info;
@@ -20,6 +22,10 @@ atom-panel.bottom .pros-terminal {
       }
     }
   }
+  pre .output {
+    margin: auto;
+    padding-left: 5px;
+  }
 
   .output {
     height: 300px;
@@ -27,6 +33,9 @@ atom-panel.bottom .pros-terminal {
     font-size: 1.1em;
     background-color: #000;
     font-family: monospace;
+    overflow: auto;
+    margin: auto;
+
     .pros-terminal-command {
       font-style: italic;
     }
@@ -40,6 +49,35 @@ atom-panel.bottom .pros-terminal {
     //   padding: 20px;
     //   font-family: monospace;
     // }
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 3px;
+  padding-left: 0;
+  padding-right: 10px;
+  font-family: monospace;
+  display: inline-flex;
+  .PS1 {
+    float: left;
+    height: 100%;
+    flex-grow: 0;
+    padding: 10px;
+    margin: 0;
+    background-color: #000;
+    border-radius: 5px 0 0 5px;
+  }
+  .text {
+    //width: 100%;
+    flex-grow: 15;
+    float: right;
+    color: #fff;
+    background-color: #000;
+    border-style: none;
+    border-radius: 0 5px 5px 0;
+    overflow-x: scroll; // In case the command is way too long
+    padding-left: 5px;
   }
 }
 

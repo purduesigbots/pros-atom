@@ -5,7 +5,7 @@
 {Disposable} = require 'atom'
 fs = require 'fs'
 cli = require './cli'
-{consumeDisplayConsole} = require './terminal-utilities'
+terminal = require './terminal-utilities'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
@@ -30,11 +30,6 @@ module.exports =
       @upgradeProjectViewProvider = UpgradeProjectView.register
       @upgradeProjectPanel = new UpgradeProjectView
 
-      @terminalViewProvider = TerminalView.register
-      @terminalViewPanel = new TerminalView
-
-      # atom.commands.add 'atom-work  space',
-      #   'PROS:Toggle-PROS': => @togglePROS()
       atom.commands.add 'atom-workspace',
         'PROS:New-Project': => @newProject()
       atom.commands.add 'atom-workspace',
@@ -45,14 +40,16 @@ module.exports =
         'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace',
         'PROS:Toggle-Terminal': => @toggleTerminal()
+      # name subject to change, this just seems the most descriptive
+      atom.commands.add 'atom-workspace',
+        'PROS:Open-Cortex': => @openCortex()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
 
-      @terminalViewPanel.toggle()
-      @terminalViewPanel.toggle()
-
   consumeLinter: lint.consumeLinter
+  consumeRunInTerminal: (service) ->
+    terminal.consumeRunInTerminal service
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
@@ -69,41 +66,21 @@ module.exports =
   upgradeProject: ->
     @upgradeProjectPanel.toggle()
 
-  toggleTerminal: ->
-    @terminalViewPanel.toggle()
+  toggleTerminal: -> cli.serialInTerminal()
 
   consumeToolbar: (getToolBar) ->
     @toolBar = getToolBar('pros')
 
-    # @toolBar.addButton {
-    #   icon: 'folder-add',
-    #   callback: 'PROS:New-Project',
-    #   tooltip: 'Create a new PROS Project',
-    #   iconset: 'fi'
-    # }
     @toolBar.addButton {
       icon: 'upload',
       callback: 'PROS:Upload-Project'
       tooltip: 'Upload PROS project',
       iconset: 'fi'
     }
-    # @toolBar.addButton {
-    #   icon: 'check',
-    #   callback: 'PROS:Register-Project',
-    #   tooltip: 'Register PROS project',
-    #   iconset: 'fi'
-    # }
-    # @toolBar.addButton {
-    #   icon: 'arrow-circle-up',
-    #   callback: 'PROS:Upgrade-Project',
-    #   tooltip: 'Upgrade existing PROS project',
-    #   iconset: 'fa'
-    # }
     @toolBar.addButton {
-      icon: 'eye-slash',
+      icon: 'circuit-board',
       callback: 'PROS:Toggle-Terminal',
-      tooltip: 'Toggle PROS terminal output visibility'
-      iconset: 'fa'
+      tooltip: 'Open cortex serial output'
     }
 
     @toolBar.onDidDestroy => @toolBar = null
@@ -111,7 +88,7 @@ module.exports =
   autocompleteProvider: ->
     autocomplete.provide()
 
-  consumeStatusBar: ->
-
+  consumeStatusBar: (statusbar) ->
+    terminal.statusBar = statusbar
 
   config: universalConfig.filterConfig config.config, 'atom'

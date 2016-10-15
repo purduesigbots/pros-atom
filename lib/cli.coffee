@@ -26,6 +26,9 @@ module.exports=
   upload: (args...) ->
     return @baseCommand().concat(['flash'].concat(args...))
 
+  terminal: (args...) ->
+    return @baseCommand().concat(['terminal'].concat(args...))
+
   executeParsed: (cb, command, params) ->
     if '--machine-output' not in command
       command.push '--machine-output'
@@ -38,7 +41,6 @@ module.exports=
       command.push '--machine-output'
     return JSON.parse e for e in utils.executeSync(command).split(/\r?\n/)
     .filter(Boolean)
-
 
   getTemplates: (cb, args...) ->
     @executeParsed cb, @lstemplate(args...), {}
@@ -63,3 +65,10 @@ module.exports=
 
   uploadInTerminal: (args...) ->
     return utils.executeInTerminal @upload args...
+
+  serialInTerminal: (args...) ->
+    return utils.executeInTerminal @terminal args...
+
+  # wrapper function for scoping reasons
+  runInTerminal: (command) ->
+    return utils.executeInTerminal command.split ' '
