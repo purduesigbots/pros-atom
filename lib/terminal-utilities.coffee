@@ -39,19 +39,24 @@ module.exports =
     return proc.stdout.read()
 
   executeInTerminal: (command) ->
+    wait = (ms) ->
+      start = new Date().getTime()
+      for num in [0...1e7]
+        if ((new Date().getTime() - start) > ms)
+          break
     if Boolean(terminalService)
       if Boolean currentTerminal
         currentTerminal.insertSelection '\x03'
-        currentTerminal.insertSelection if navigator.platform is 'Win32' then 'cls' else 'clear'
-        # Run clear twice in case there wasn't a command running previously.
-        # Interrupt control character will screw the first clear
-        currentTerminal.insertSelection if navigator.platform is 'Win32' then 'cls' else 'clear'
+        wait 75 # hard code waits to allow commands to be executed
+        currentTerminal.insertSelection(if navigator.platform is 'Win32' then 'cls' else 'clear')
+        wait 75
         currentTerminal.insertSelection command.join ' '
         currentTerminal.focus()
       else
         currentTerminal = terminalService.run([command.join ' '])[0].spacePenView
         currentTerminal.statusIcon.style.color = '#cca352'
         currentTerminal.statusIcon.updateName 'PROS CLI'
+        currentTerminal.panel.onDidDestroy () -> currentTerminal = null
       return currentTerminal
     else
       return null
