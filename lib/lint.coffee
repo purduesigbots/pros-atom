@@ -5,6 +5,7 @@ fs = require 'fs'
 linthelp = require 'atom-linter'
 path = require 'path'
 terminal = require './terminal-utilities'
+utils = require './utils'
 
 module.exports =
   messages: {}
@@ -24,11 +25,7 @@ module.exports =
     else undefined
 
   lint: (editor, lintable_file, real_file) ->
-    cwd = ''
-    current_path = atom.workspace.getActiveTextEditor().getPath()
-    for project in atom.project.getPaths()
-      if current_path.indexOf(project) == 0 and project.length > cwd
-        cwd = project
+    cwd = utils.findRoot atom.workspace.getActiveTextEditor().getPath()
 
     settings = config.settings real_file
 

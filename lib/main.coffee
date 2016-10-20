@@ -11,6 +11,7 @@ lint = require './lint'
 config = require './config'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
+utils = require './utils'
 
 module.exports =
   provideBuilder: provideBuilder
@@ -44,6 +45,9 @@ module.exports =
       atom.commands.add 'atom-workspace',
         'PROS:Open-Cortex': => @openCortex()
 
+      atom.commands.add 'atom-workspace',
+        'PROS:Test': -> console.log utils.findRoot atom.workspace.getActiveTextEditor().getPath()
+
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
 
@@ -53,9 +57,8 @@ module.exports =
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal '-f "' + \
-        (atom.project.relativizePath(atom.workspace.getActiveTextEditor().getPath())[0] or \
-          atom.project.getPaths()[0]) + '"'
+      root = atom.workspace.getActiveTextEditor().getPath() or atom.project.getPaths()[0]
+      cli.uploadInTerminal '-f "' + utils.findRoot(root) + '"'
 
   newProject: ->
     @newProjectPanel.toggle()
