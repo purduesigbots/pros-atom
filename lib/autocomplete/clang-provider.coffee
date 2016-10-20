@@ -39,7 +39,7 @@ class ClangProvider
     command = 'clang'
     args = @buildClangArgs(editor, row, column, language)
     options =
-      cwd: utils.getRoot atom.workspace.getActiveTextEditor().getPath()
+      cwd: utils.findRoot atom.workspace.getActiveTextEditor().getPath()
       input: editor.getText()
     new Promise (resolve) =>
       allOutput = []
