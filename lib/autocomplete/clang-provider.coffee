@@ -7,6 +7,7 @@ path = require 'path'
 {existsSync} = require 'fs'
 ClangFlags = require 'clang-flags'
 config = require '../config'
+utils = require '../utils'
 
 module.exports =
 class ClangProvider
@@ -38,15 +39,15 @@ class ClangProvider
     command = 'clang'
     args = @buildClangArgs(editor, row, column, language)
     options =
-      cwd: atom.project.getPaths().filter((project) -> ~atom.workspace.getActiveTextEditor().getPath().indexOf project)?[0]
+      cwd: utils.getRoot atom.workspace.getActiveTextEditor().getPath()
       input: editor.getText()
     new Promise (resolve) =>
       allOutput = []
-      stdout = (output) => allOutput.push(output)
-      stderr = (output) => console.log output
+      stdout = (output) -> allOutput.push output
+      stderr = (output) -> console.log output
       exit = (code) => resolve(@handleCompletionResult(allOutput.join('\n'), code, prefix))
       bufferedProcess = new BufferedProcess({command, args, options, stdout, stderr, exit})
-      bufferedProcess.process.stdin.setEncoding = 'utf-8';
+      bufferedProcess.process.stdin.setEncoding = 'utf-8'
       bufferedProcess.process.stdin.write(editor.getText())
       bufferedProcess.process.stdin.end()
 
@@ -93,9 +94,9 @@ class ClangProvider
     outputLines = result.match(completionsRe)
 
     if outputLines?
-        return (@convertCompletionLine(line, prefix) for line in outputLines)
+      return (@convertCompletionLine(line, prefix) for line in outputLines)
     else
-        return []
+      return []
 
   buildClangArgs: (editor, row, column, language) ->
     settings = config.settings()
