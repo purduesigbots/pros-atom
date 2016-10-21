@@ -29,7 +29,7 @@ module.exports =
         return @files.length > 0
 
       settings: () ->
-        args = [ '-j' + config.settings('.').parallel_make_jobs or 2]
+        args = [ '-j' + config.settings('.').parallel_make_jobs or 1]
 
         if navigator.platform == 'Win32' and !!process.env['PROS_TOOLCHAIN'] and \
            process.env['PROS_TOOLCHAIN'] not in process.env['PATH']
