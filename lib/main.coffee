@@ -1,7 +1,8 @@
+{CompositeDisposable} = require 'atom'
 {NewProjectView} = require './views/new-project/new-project-view'
 {RegisterProjectView} = require './views/register-project/register-project-view'
 {UpgradeProjectView} = require './views/upgrade-project/upgrade-project-view'
-{TerminalView} = require './views/terminal/terminal-view'
+# {`TerminalView`} = require './views/terminal/terminal-view'
 {Disposable} = require 'atom'
 fs = require 'fs'
 cli = require './cli'
@@ -12,10 +13,20 @@ config = require './config'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 
+WelcomeView = null
+
+createWelcomeView = (state) ->
+  WelcomeView = require './views/welcome/welcome-view'
+  new WelcomeView(state)
+
 module.exports =
   provideBuilder: provideBuilder
 
+  showWelcome: ->
+    atom.workspace.open 'pros://welcome'
+
   activate: ->
+    @subscriptions = new CompositeDisposable
     require('atom-package-deps').install('pros').then () =>
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
@@ -30,6 +41,10 @@ module.exports =
       @upgradeProjectViewProvider = UpgradeProjectView.register
       @upgradeProjectPanel = new UpgradeProjectView
 
+      @subscriptions.add atom.deserializers.add
+        name: 'ProsWelcomeView'
+        deserialize: (state) -> createWelcomeView state
+
       atom.commands.add 'atom-workspace',
         'PROS:New-Project': => @newProject()
       atom.commands.add 'atom-workspace',
@@ -40,9 +55,16 @@ module.exports =
         'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace',
         'PROS:Toggle-Terminal': => @toggleTerminal()
+      atom.commands.add 'atom-workspace',
+        'PROS:Show-Welcome': => @showWelcome()
       # name subject to change, this just seems the most descriptive
       atom.commands.add 'atom-workspace',
         'PROS:Open-Cortex': => @openCortex()
+
+      @subscriptions.add atom.workspace.addOpener (uri) ->
+        if uri is 'pros://welcome'
+          createWelcomeView uri: 'pros://welcome'
+      @showWelcome()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
