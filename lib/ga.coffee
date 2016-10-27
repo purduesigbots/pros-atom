@@ -26,7 +26,7 @@ module.exports =
         ec: 'session'
         ea: "#{sessionControl}_session"
         tid: 'UA-84548828-2'
-        cid: atom.config.get 'pros.google-analytics.cid'
+        cid: atom.config.get 'pros.googleAnalytics.cid'
       }
       extend params,
         sc: sessionControl
@@ -34,6 +34,7 @@ module.exports =
 
     @post: (url) ->
       xhr = new XMLHttpRequest()
+      console.log url
       xhr.open "POST", url
       xhr.send null
 
