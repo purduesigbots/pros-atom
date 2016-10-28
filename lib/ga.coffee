@@ -34,7 +34,6 @@ module.exports =
 
     @post: (url) ->
       xhr = new XMLHttpRequest()
-      console.log url
       xhr.open "POST", url
       xhr.send null
 

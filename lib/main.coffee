@@ -36,15 +36,21 @@ module.exports =
       if !!atom.config.get 'pros.googleAnalytics.cid'
         atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       # Begin client session
-      if atom.config.get 'pros.googleAnalytics.enabled'
+      if atom.config.get 'pros.googleAnalytics.enabled' and \
+         atom.config.get('core.telemetryConsent') is 'limited'
         GA.sendData()
       # Watch config to make sure we start or end sessions as needed
       atom.config.onDidChange 'pros.googleAnalytics.enabled', ->
-        if atom.config.get 'pros.googleAnalytics.enabled'
+        if atom.config.get 'pros.googleAnalytics.enabled' and \
+           atom.config.get('core.telemetryConsent') is 'limited'
           if !!atom.config.get 'pros.googleAnalytics.cid'
             atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
           GA.sendData()
         else
+          GA.sendData sessionControl = 'end'
+
+      atom.config.onDidChange 'core.telemetryConsent', ->
+        if atom.config.get('core.telemetryConsent') is 'no'
           GA.sendData sessionControl = 'end'
 
       if config.settings('').override_beautify_provider
@@ -85,13 +91,14 @@ module.exports =
       if atom.config.get 'pros.welcome.enabled'
         @showWelcome()
 
-      cli.execute(((c, o) -> console.log o),
+      cli.execute(((c, o) -> console.log o if o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
       @PROSstatus = true
 
   deactivate: ->
     # End client session
-    if atom.config.get 'pros.googleAnalytics.enabled'
+    if atom.config.get 'pros.googleAnalytics.enabled' and \
+       atom.config.get('core.telemetryConsent') is 'limited'
       GA.sendData sessionControl = 'end'
 
   togglePROS: =>
@@ -113,7 +120,7 @@ module.exports =
   uploadProject: ->
     if atom.project.getPaths().length > 0
       cli.uploadInTerminal '-f "' + \
-        (atom.project.relativizePath(atom.workspace.getActiveTextEditor().getPath())[0] or \
+        (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
           atom.project.getPaths()[0]) + '"'
 
   newProject: ->
