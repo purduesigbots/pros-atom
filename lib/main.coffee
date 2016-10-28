@@ -7,11 +7,13 @@
 fs = require 'fs'
 cli = require './cli'
 terminal = require './terminal-utilities'
+GA = require './ga'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
+buttons = require './buttons'
 
 WelcomeView = null
 
@@ -28,6 +30,22 @@ module.exports =
   activate: ->
     @subscriptions = new CompositeDisposable
     require('atom-package-deps').install('pros').then () =>
+      # Generate a new client ID if needed
+      # atom.config.get 'pros.googleAnalytics.enabled' and\
+      if !!atom.config.get 'pros.googleAnalytics.cid'
+        atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
+      # Begin client session
+      if atom.config.get 'pros.googleAnalytics.enabled'
+        GA.sendData()
+      # Watch config to make sure we start or end sessions as needed
+      atom.config.onDidChange 'pros.googleAnalytics.enabled', ->
+        if atom.config.get 'pros.googleAnalytics.enabled'
+          if !!atom.config.get 'pros.googleAnalytics.cid'
+            atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
+          GA.sendData()
+        else
+          GA.sendData sessionControl = 'end'
+
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
       lint.activate()
@@ -69,6 +87,11 @@ module.exports =
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
 
+  deactivate: ->
+    # End client session
+    if atom.config.get 'pros.googleAnalytics.enabled'
+      GA.sendData sessionControl = 'end'
+
   consumeLinter: lint.consumeLinter
   consumeRunInTerminal: (service) ->
     terminal.consumeRunInTerminal service
@@ -93,17 +116,18 @@ module.exports =
   consumeToolbar: (getToolBar) ->
     @toolBar = getToolBar('pros')
 
-    @toolBar.addButton {
-      icon: 'upload',
-      callback: 'PROS:Upload-Project'
-      tooltip: 'Upload PROS project',
-      iconset: 'fi'
-    }
-    @toolBar.addButton {
-      icon: 'circuit-board',
-      callback: 'PROS:Toggle-Terminal',
-      tooltip: 'Open cortex serial output'
-    }
+    buttons.addButtons @toolBar
+    # @toolBar.addButton {
+    #   icon: 'upload',
+    #   callback: 'PROS:Upload-Project'
+    #   tooltip: 'Upload PROS project',
+    #   iconset: 'fi'
+    # }
+    # @toolBar.addButton {
+    #   icon: 'circuit-board',
+    #   callback: 'PROS:Toggle-Terminal',
+    #   tooltip: 'Open cortex serial output'
+    # }
 
     @toolBar.onDidDestroy => @toolBar = null
 
