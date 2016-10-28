@@ -14,6 +14,7 @@ config = require './config'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 buttons = require './buttons'
+StatusBar = require './views/statusbar'
 
 WelcomeView = null
 
@@ -75,9 +76,8 @@ module.exports =
         'PROS:Toggle-Terminal': => @toggleTerminal()
       atom.commands.add 'atom-workspace',
         'PROS:Show-Welcome': => @showWelcome()
-      # name subject to change, this just seems the most descriptive
       atom.commands.add 'atom-workspace',
-        'PROS:Open-Cortex': => @openCortex()
+        'PROS:Toggle-PROS': => @togglePROS()
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
         if uri is 'pros://welcome'
@@ -86,11 +86,24 @@ module.exports =
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
+      @PROSstatus = true
 
   deactivate: ->
     # End client session
     if atom.config.get 'pros.googleAnalytics.enabled'
       GA.sendData sessionControl = 'end'
+
+  togglePROS: =>
+    if @PROSstatus or not @PROSstatus?
+      @toolBar.removeItems()
+      lint.deactivate()
+      autocomplete.deactivate()
+      @PROSstatus = false
+    else
+      buttons.addButtons @toolBar
+      lint.activate()
+      autocomplete.activate()
+      @PROSstatus = true
 
   consumeLinter: lint.consumeLinter
   consumeRunInTerminal: (service) ->
@@ -113,21 +126,10 @@ module.exports =
 
   toggleTerminal: -> cli.serialInTerminal()
 
-  consumeToolbar: (getToolBar) ->
+  consumeToolbar: (getToolBar) =>
     @toolBar = getToolBar('pros')
 
     buttons.addButtons @toolBar
-    # @toolBar.addButton {
-    #   icon: 'upload',
-    #   callback: 'PROS:Upload-Project'
-    #   tooltip: 'Upload PROS project',
-    #   iconset: 'fi'
-    # }
-    # @toolBar.addButton {
-    #   icon: 'circuit-board',
-    #   callback: 'PROS:Toggle-Terminal',
-    #   tooltip: 'Open cortex serial output'
-    # }
 
     @toolBar.onDidDestroy => @toolBar = null
 
@@ -135,6 +137,6 @@ module.exports =
     autocomplete.provide()
 
   consumeStatusBar: (statusbar) ->
-    terminal.statusBar = statusbar
+    @statusBarTile = new StatusBar(statusbar)
 
   config: universalConfig.filterConfig config.config, 'atom'
