@@ -82,7 +82,8 @@ module.exports =
       @subscriptions.add atom.workspace.addOpener (uri) ->
         if uri is 'pros://welcome'
           createWelcomeView uri: 'pros://welcome'
-      @showWelcome()
+      if atom.config.get 'pros.welcome.enabled'
+        @showWelcome()
 
       cli.execute(((c, o) -> console.log o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])

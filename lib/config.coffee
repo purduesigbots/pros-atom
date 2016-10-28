@@ -105,7 +105,14 @@ module.exports =
           Please do not change this value unless you have \'enabled\' set to \'false\''
           type: 'string'
           default: ''
-
+    welcome:
+      title: 'Welcome Page'
+      type: 'object'
+      properties:
+        enabled:
+          title: 'Show on startup'
+          type: 'boolean'
+          default: true
     lint:
       type: 'object'
       properties:

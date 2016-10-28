@@ -1,5 +1,17 @@
-.pros-weclome .container {
+@import "octicon-mixins";
+@import "ui-variables";
+
+.pros-welcome {
+    background-color: @base-background-color;
+    display: flex;
+}
+
+div.pros-welcome > div {
   width: 100%;
+  padding: 0 2em 3em 2em;
+  margin: auto;
+  max-width: 580px;
+  min-width: 300px;
 }
 
 .pros-welcome .header .hero {
@@ -18,9 +30,16 @@
 }
 
 .pros-welcome .header a:hover .title {
-
   text-decoration: none;
 }
 
 .pros-welcome .panel {
+  background-color: @base-background-color;
+}
+
+.pros-welcome .footer {
+  text-align: center;
+}
+.pros-welcome .footer > * {
+  padding: 1px;
 }

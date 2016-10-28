@@ -30,7 +30,7 @@ module.exports =
     initialize: (@statusBarProvider) ->
       @button[0].firstChild.onclick = @button.onclick = ->
         console.log 'Disabling PROS'
-        atom.commands.dispatch atom.views.getView(atom.workspace.getActiveTextEditor()),
+        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()),
           'PROS:Toggle-PROS'
       console.log @button
       @attach()
