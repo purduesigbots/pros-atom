@@ -10,6 +10,7 @@ terminal = require './terminal-utilities'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
+utils = require './utils'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 
@@ -25,7 +26,12 @@ module.exports =
   showWelcome: ->
     atom.workspace.open 'pros://welcome'
 
+  updateWelcomePkgVersion: (version) ->
+    
+
   activate: ->
+    utils.prosVersion()
+    utils.packageVersion()
     @subscriptions = new CompositeDisposable
     require('atom-package-deps').install('pros').then () =>
       if config.settings('').override_beautify_provider
