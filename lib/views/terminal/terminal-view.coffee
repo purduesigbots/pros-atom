@@ -97,6 +97,6 @@ module.exports =
         cb c, outBuf
 
       if not @isVisible() then @toggle()
-      @cancelBtn.onclick = =>
+      @cancelBtn.onclick = ->
         console.log "Killing #{command.join ' '}"
         proc.stdin.end('\x1b\n')
