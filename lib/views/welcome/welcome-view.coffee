@@ -2,6 +2,7 @@
 {$, ScrollView} = require 'atom-space-pen-views'
 {BaseView} = require '../base-view'
 shell = require 'shell'
+utils = require '../../utils'
 
 module.exports =
   class WelcomeView extends ScrollView
@@ -41,6 +42,11 @@ module.exports =
             @a outlet: 'home', => @raw 'pros.cs.purdue.edu'
             @span class: 'text-subtle', => @raw 'ｘ'
             @a outlet: 'github', class: 'icon icon-octoface'
+            @span class: 'text-subtle', id: 'cliVersion', => @raw 'x'
+            @span class: 'text-subtle', id: 'pkgVersion', => @raw 'x'
+
+    updateCliVersion: (arg) ->
+      $(this).find('#cliVersion').innerHTML.replace 'x', 3
 
     initialize: ->
       @header[0].onclick =-> shell.openExternal 'http://pros.cs.purdue.edu'
@@ -59,6 +65,8 @@ module.exports =
       $(this).find('#pros-ga-enabled').click =>
         atom.config.set 'pros.googleAnalytics.enabled',
           $(this).find('#pros-ga-enabled').prop 'checked'
+
+      updateCliVersion()
 
     @deserialize: (options={}) ->
       new WelcomeView(options)

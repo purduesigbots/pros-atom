@@ -31,6 +31,7 @@ module.exports =
         console.log "error getting package version: #{error}"
       else
         @pkgVersion = stdout.replace 'pros@', ''
+        # cb0 @pkgVersion
 
     if navigator.platform is 'Win32'
       cp.exec 'apm list -d -i -l -p --bare | find /i "pros"', cb

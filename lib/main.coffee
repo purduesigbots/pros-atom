@@ -8,6 +8,7 @@ fs = require 'fs'
 cli = require './cli'
 terminal = require './terminal-utilities'
 GA = require './ga'
+utils = require './utils'
 {provideBuilder} = require './make'
 lint = require './lint'
 config = require './config'
@@ -29,6 +30,9 @@ module.exports =
     atom.workspace.open 'pros://welcome'
 
   activate: ->
+    
+    utils.packageVersion()
+    utils.prosVersion()
     @subscriptions = new CompositeDisposable
     require('atom-package-deps').install('pros').then () =>
       # Generate a new client ID if needed
