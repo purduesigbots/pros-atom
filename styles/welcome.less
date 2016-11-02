@@ -4,6 +4,7 @@
 .pros-welcome {
     background-color: @base-background-color;
     display: flex;
+    overflow: auto;
 }
 
 div.pros-welcome > div {
@@ -29,6 +30,10 @@ div.pros-welcome > div {
   font-size: 1.4em;
 }
 
+.pros-text {
+  fill: @text-color-selected;
+}
+
 .pros-welcome .header a:hover .title {
   text-decoration: none;
 }
@@ -46,6 +51,21 @@ div.pros-welcome > div {
 
 .pros-welcome form input {
   margin-right: 3px;
+}
+
+.pros-welcome .versions {
+  display: flex;
+}
+
+.pros-welcome .versions > div {
+  margin: auto;
+  display: inline;
+}
+
+.pros-welcome .versions > div > div{
+  margin: 5px;
+  display: inline-block;
+  text-align: center;
 }
 
 .pros-welcome .footer {

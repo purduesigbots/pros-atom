@@ -33,9 +33,10 @@ module.exports =
       @post "https://google-analytics.com/collect?#{querystring.stringify params}"
 
     @post: (url) ->
-      xhr = new XMLHttpRequest()
-      xhr.open "POST", url
-      xhr.send null
+      if not atom.inDevMode()
+        xhr = new XMLHttpRequest()
+        xhr.open "POST", url
+        xhr.send null
 
     @generateUUID: ->
       generateUUID()
