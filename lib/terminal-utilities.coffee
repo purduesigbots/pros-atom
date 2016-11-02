@@ -10,7 +10,6 @@ module.exports =
     if Boolean terminalService
       return new Disposable () -> return
     terminalService = service
-    console.log terminalService
     return new Disposable () -> terminalService = null
 
   execute: (cb, command, params = {}) ->
