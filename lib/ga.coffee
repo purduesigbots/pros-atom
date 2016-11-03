@@ -20,6 +20,8 @@ extend = (target, propertyMaps...) ->
 module.exports =
   class GA
     @sendData: (sessionControl = 'start') ->
+      if !!atom.config.get 'pros.googleAnalytics.cid'
+        atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       params = {
         v: 1
         t: 'event'
@@ -33,10 +35,10 @@ module.exports =
       @post "https://google-analytics.com/collect?#{querystring.stringify params}"
 
     @post: (url) ->
-      if not atom.inDevMode()
-        xhr = new XMLHttpRequest()
-        xhr.open "POST", url
-        xhr.send null
+      # if not atom.inDevMode()
+      xhr = new XMLHttpRequest()
+      xhr.open "POST", url
+      xhr.send null
 
     @generateUUID: ->
       generateUUID()

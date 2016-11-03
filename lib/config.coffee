@@ -60,7 +60,7 @@ module.exports =
       scope: ['atom']
     parallel_make_jobs:
       type: 'integer'
-      default: 2
+      default: 1
       minimum: 1
       scope: ['atom']
     max_scan_iterations:
