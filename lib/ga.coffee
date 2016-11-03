@@ -20,7 +20,7 @@ extend = (target, propertyMaps...) ->
 module.exports =
   class GA
     @sendData: (sessionControl = 'start') ->
-      if !!atom.config.get 'pros.googleAnalytics.cid'
+      if !!!atom.config.get 'pros.googleAnalytics.cid'
         atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       params = {
         v: 1
@@ -42,3 +42,10 @@ module.exports =
 
     @generateUUID: ->
       generateUUID()
+
+    @startSession: =>
+      if atom.config.get('pros.googleAnalytics.enabled') and \
+         atom.config.get('core.telemetryConsent') is 'limited'
+        if !!!atom.config.get 'pros.googleAnalytics.cid'
+          atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
+        @sendData()

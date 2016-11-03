@@ -33,20 +33,15 @@ module.exports =
     require('atom-package-deps').install('pros').then () =>
       # Generate a new client ID if needed
       # atom.config.get 'pros.googleAnalytics.enabled' and\
-      if !!atom.config.get 'pros.googleAnalytics.cid'
-        atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
       # Begin client session
-      if atom.config.get('pros.googleAnalytics.enabled') and \
-         atom.config.get('core.telemetryConsent') is 'limited'
-        GA.sendData()
+      GA.startSession()
       # Watch config to make sure we start or end sessions as needed
       atom.config.onDidChange 'pros.googleAnalytics.enabled', ->
         if atom.config.get('pros.googleAnalytics.enabled') and \
            atom.config.get('core.telemetryConsent') is 'limited'
-          if !!atom.config.get 'pros.googleAnalytics.cid'
-            atom.config.set 'pros.googleAnalytics.cid', GA.generateUUID()
-          GA.sendData()
+          GA.startSession()
         else
+          atom.config.set 'pros.googleAnalytics.cid', ''
           GA.sendData sessionControl = 'end'
 
       atom.config.onDidChange 'core.telemetryConsent', ->
