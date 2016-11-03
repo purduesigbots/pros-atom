@@ -26,7 +26,8 @@
     "fs-extra": "^0.26.1",
     "split-string": "^0.1.0",
     "tempfile": "^1.1.0",
-    "voucher": "^0.1.2"
+    "voucher": "^0.1.2",
+    "fs-plus": "^2.9.0"
   },
   "package-deps": [
     "linter",
