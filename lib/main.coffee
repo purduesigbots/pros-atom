@@ -106,7 +106,7 @@ module.exports =
       @toolBar.removeItems()
       lint.deactivate()
       autocomplete.deactivate()
-      build.de
+      # build.deactivate()
       @PROSstatus = false
     else
       buttons.addButtons @toolBar
