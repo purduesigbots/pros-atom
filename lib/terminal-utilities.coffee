@@ -26,7 +26,7 @@ module.exports =
       outBuf += data
       params?.onstdout?(data)
     proc.on 'exit', (c, o, e) ->
-      cb c, outBuf
+      cb c, outBuf or o
     return proc
 
   executeSync: (command) ->

@@ -21,13 +21,14 @@
     "atom-space-pen-views": "^2.1.1",
     "atom-package-deps": "^4.0.0",
     "clang-flags": "0.2.2",
-    "command-exists": "^1.0.0",
     "event-kit": "^2.1.0",
     "fs-extra": "^0.26.1",
+    "semver": "^5.0.0",
     "split-string": "^0.1.0",
     "tempfile": "^1.1.0",
     "voucher": "^0.1.2",
-    "fs-plus": "^2.9.0"
+    "fs-plus": "^2.9.0",
+    "async": "^1.5.2"
   },
   "package-deps": [
     "linter",
@@ -70,5 +71,8 @@
         "2.0.0": "autocompleteProvider"
       }
     }
+  },
+  "deserializers": {
+    "ConductorView": "deserializeConductorView"
   }
 }

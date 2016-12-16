@@ -5,6 +5,7 @@
 # {`TerminalView`} = require './views/terminal/terminal-view'
 {Disposable} = require 'atom'
 fs = require 'fs'
+path = require 'path'
 cli = require './cli'
 terminal = require './terminal-utilities'
 GA = require './ga'
@@ -15,18 +16,20 @@ universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 buttons = require './buttons'
 StatusBar = require './views/statusbar'
+utils = require './utils'
 
 WelcomeView = null
+ConductorView = null
+AddLibraryModal = null
 
-createWelcomeView = (state) ->
-  WelcomeView = require './views/welcome/welcome-view'
-  new WelcomeView(state)
+welcomeUri = 'pros://welcome'
+conductorUri = 'pros://conductor'
+conductorRegex = /conductor\/(.+)/i
+addLibraryUri = 'pros://addlib'
+addLibraryRegex = /addlib\/(.+)/i
 
 module.exports =
   provideBuilder: provideBuilder
-
-  showWelcome: ->
-    atom.workspace.open 'pros://welcome'
 
   activate: ->
     @subscriptions = new CompositeDisposable
@@ -65,30 +68,50 @@ module.exports =
         name: 'ProsWelcomeView'
         deserialize: (state) -> createWelcomeView state
 
+      atom.commands.add 'atom-workspace', 'PROS:New-Project': -> new (require './views/new-project')
+      atom.commands.add 'atom-workspace', 'PROS:Upgrade-Project': => @upgradeProject()
+      atom.commands.add 'atom-workspace', 'PROS:Register-Project': => @registerProject()
+      atom.commands.add 'atom-workspace', 'PROS:Upload-Project': => @uploadProject()
+      atom.commands.add 'atom-workspace', 'PROS:Toggle-Terminal': => @toggleTerminal()
+      atom.commands.add 'atom-workspace', 'PROS:Show-Welcome': -> atom.workspace.open welcomeUri
+      atom.commands.add 'atom-workspace', 'PROS:Toggle-PROS': => @togglePROS()
+      atom.commands.add 'atom-workspace', 'PROS:Open-Conductor': ->
+        currentProject = atom.project.relativizePath atom.workspace.getActiveTextEditor()?.getPath()
+        if currentProject[0]
+          atom.workspace.open "#{conductorUri}/#{currentProject[0]}"
+        else
+          atom.workspace.open conductorUri
       atom.commands.add 'atom-workspace',
-        'PROS:New-Project': => @newProject()
-      atom.commands.add 'atom-workspace',
-        'PROS:Upgrade-Project': => @upgradeProject()
-      atom.commands.add 'atom-workspace',
-        'PROS:Register-Project': => @registerProject()
-      atom.commands.add 'atom-workspace',
-        'PROS:Upload-Project': => @uploadProject()
-      atom.commands.add 'atom-workspace',
-        'PROS:Toggle-Terminal': => @toggleTerminal()
-      atom.commands.add 'atom-workspace',
-        'PROS:Show-Welcome': => @showWelcome()
-      atom.commands.add 'atom-workspace',
-        'PROS:Toggle-PROS': => @togglePROS()
+        'PROS:Add-Library': ->
+          new (require './views/add-library') path: atom.project.getPaths()?[0]
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
-        if uri is 'pros://welcome'
-          createWelcomeView uri: 'pros://welcome'
+        if uri is welcomeUri
+          WelcomeView ?= new (require './views/welcome') {welcomeUri}
+
+      @subscriptions.add atom.workspace.addOpener (uri) ->
+        if uri.startsWith conductorUri
+          ConductorView ?= new (require('./views/conductor')) {conductorUri}
+          if match = conductorRegex.exec uri
+            ConductorView.updateAvailableProjects()
+            ConductorView.updateSelectedPath match[1]
+          ConductorView
+
       if atom.config.get 'pros.welcome.enabled'
-        @showWelcome()
+        atom.workspace.open welcomeUri
 
       cli.execute(((c, o) -> console.log o if o),
         cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
       @PROSstatus = true
+
+      grammarSubscription = atom.grammars.onDidAddGrammar (grammar) ->
+        if grammar.scopeName is 'source.json'
+          grammarSubscription.dispose()
+          grammar.fileTypes.push 'pros'
+          process.nextTick ->
+            for e in atom.workspace.getTextEditors()
+              if path.extname(e.getPath()) == '.pros'
+                e.setGrammar grammar
 
   deactivate: ->
     # End client session
@@ -132,9 +155,7 @@ module.exports =
 
   consumeToolbar: (getToolBar) =>
     @toolBar = getToolBar('pros')
-
     buttons.addButtons @toolBar
-
     @toolBar.onDidDestroy => @toolBar = null
 
   autocompleteProvider: ->
@@ -142,5 +163,8 @@ module.exports =
 
   consumeStatusBar: (statusbar) ->
     @statusBarTile = new StatusBar(statusbar)
+
+  deserializeConductorView: (data) ->
+    ConductorView ?= new (require('./views/conductor')) data
 
   config: universalConfig.filterConfig config.config, 'atom'

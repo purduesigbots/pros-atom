@@ -54,7 +54,7 @@ module.exports =
           op.value = JSON.stringify e
           op.innerHTML = e.version + ' from ' + e.depot
           @dropdown.appendChild(op)
-        ), '--offline-only'
+        ), '--offline-only --kernels'
 
 
     cancel: ->

@@ -39,7 +39,7 @@ module.exports =
           if e.version not in kernels
             kernels.push e.version
             @templateDropdown.appendChild @createOption e.version, e.version
-        ), '--offline-only'
+        ), '--offline-only --kernels'
 
     cancel: ->
       @directoryDropdown.removeChild @directoryDropdown.firstChild \

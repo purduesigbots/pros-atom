@@ -41,7 +41,7 @@ module.exports =
           op.value = e
           op.innerHTML = e.version + ' from ' + e.depot
           @templateDropdown.appendChild(op)
-        ), '--offline-only'
+        ), '--offline-only --kernels'
 
     cancel: ->
       @directoryDropdown.removeChild @directoryDropdown.firstChild while @directoryDropdown.firstChild

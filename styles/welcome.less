@@ -15,23 +15,37 @@ div.pros-welcome > div {
   min-width: 300px;
 }
 
-.pros-welcome .header .hero {
+.pros-welcome .header {
   margin: auto;
+  display: block;
 }
-.pros-welcome .header .hero svg {
-  width: 100%;
-  height: 25em;
+.pros-welcome .header > svg:first-child {
+  width: 12em;
+  height: 12em;
+  margin: 0 auto;
+  display: block;
 }
+
+.pros-welcome .header > svg:nth-child(2) {
+  display:block;
+  margin: 1em auto 0 auto;
+  path {
+    fill: @text-color-selected;
+  }
+}
+.pros-welcome .header > h1 {
+  font-size: 4.75em;
+  color: @text-color-selected;
+  text-align: center;
+  cursor: default;
+}
+
 .pros-welcome .header .title {
   font-style: italic;
   font-weight: normal;
   text-decoration: none;
   text-align: center;
   font-size: 1.4em;
-}
-
-.pros-text {
-  fill: @text-color-selected;
 }
 
 .pros-welcome .header a:hover .title {

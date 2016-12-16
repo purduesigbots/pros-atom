@@ -1,6 +1,7 @@
 fs = require 'fs-plus'
 path = require 'path'
 cp = require 'child_process'
+async = require 'async'
 @cliVersion = ''
 @pkgVersion = ''
 
@@ -48,3 +49,15 @@ module.exports =
         @cliVersion = stdout.replace 'pros, version ', ''
 
     # cb0 @cliVersion
+
+  findOpenPROSProjectsSync: ->
+    results = []
+    traversal = (dir) ->
+      fs.traverseTreeSync dir,
+      ((file) ->
+        if path.basename(file) == 'project.pros'
+          results.push path.dirname file
+      ),
+      ((d) ->)
+    traversal project for project in atom.project.getPaths()
+    return results
