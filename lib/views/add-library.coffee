@@ -3,6 +3,7 @@
 fs = require 'fs'
 path = require 'path'
 cli = require '../cli'
+utils = require '../utils'
 
 module.exports =
   class AddLibraryModal extends View
@@ -18,9 +19,7 @@ module.exports =
               @span class: 'icon icon-three-bars'
             @subview 'projectPathEditor', new TextEditorView mini: true
           @ol class: 'list-group', =>
-            for p in atom.project.getPaths()
-              if fs.existsSync path.join p, 'project.pros'
-                @li p
+            (@li p) for p in utils.findOpenPROSProjectsSync()
         @h4 'Choose a library:'
         @div class: 'library-picker select-list', =>
           @ol class: 'list-group', outlet: 'libraryList', =>

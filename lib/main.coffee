@@ -87,7 +87,8 @@ module.exports =
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
         if uri is welcomeUri
-          WelcomeView ?= new (require './views/welcome') {welcomeUri}
+          console.log WelcomeView ?= (require './react/conductor')
+          return WelcomeView
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
         if uri.startsWith conductorUri

@@ -1,229 +1,300 @@
 @import "octicon-mixins";
 @import "ui-variables";
 @import "purdueros";
-
-
 .pros-conductor-parent {
-  background-color: @base-background-color;
+    background-color: @base-background-color;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 .pros-conductor {
     padding: 1em;
     max-width: 1000px;
     margin: auto;
+    .header {
+        display: flex;
+        padding-left: auto;
+        padding-right: auto;
+        align-items: center;
+        justify-content: center;
+    }
+    .header svg {
+        height: 6em;
+        width: 6em;
+        margin: 10px;
+    }
+    .header .title > h1 {
+        margin-bottom: 0.25em;
+    }
+    .header .title > h2 {
+        font-style: italic;
+        margin-top: 0.25em;
+    }
+    .error-presenter {
+        display: none;
+    }
+    .error-presenter.enabled {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0 50px;
+        background-color: fade(@background-color-warning, 7%);
+        border-radius: 5px;
+        border-color: @background-color-error;
+        border-width: thin;
+        border-style: solid;
+    }
+    .error-presenter.enabled .background-message {
+        color: mix(@text-color-error, @text-color-subtle, 75%);
+        text-align: center;
+    }
+    .error-presenter.enabled > div {
+        flex-grow: 1;
+        padding-bottom: 20px;
+    }
+    .error-presenter.enabled ~:not(.error-presenter):not(.header) {
+        display: none !important;
+    }
+    .project,
+    .project-selector {
+        margin-top: 15px;
+    }
+    .project-selector {
+        display: flex;
+    }
+    .project-selector .recent-projects {
+        display: flex;
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+        overflow-x: auto;
+        min-width: 250px;
+    }
+    .project-selector > * {
+        height: 4em;
+    }
+    .project-selector .recent-projects > li {
+        margin-left: 5px;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        border-radius: 2px;
+        border-color: 0;
+        border-width: 0px;
+    }
+    .project-selector .recent-projects > .selected {
+        background-color: @background-color-selected;
+        font-weight: bold;
+    }
+    .project-selector .recent-projects > li:hover {
+        background-color: @background-color-highlight;
+    }
+    .project-selector .recent-projects > li > div {
+        align-self: center;
+    }
+    .project-selector .recent-projects > li .name {
+        width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .project-selector .recent-projects > li .dir {
+        width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: @text-color-subtle;
+        text-align: left;
+        direction: rtl;
+    }
+    .project.disabled {
+        visibility: collapse;
+    }
+    .project >:first-child {
+        font-style: italic;
+    }
+    .project > div > .loading {
+        display: none;
+    }
+    .project.loading > div> .loading {
+        display: flex;
+        margin: 0 auto;
+    }
+    .project.loading > div > div {
+        display: none;
+    }
+    .project > div {
+        display: flex;
+        min-height: 11em;
+    }
+    .project .kernel {
+        flex-grow: 1;
+        padding: 5px;
+    }
+    .project h3 {
+        margin-top: 0;
+    }
+    .project .kernel > div > div {
+        display: flex;
+    }
+    .project .text-success .icon-move-up {
+        display: none;
+    }
+    .project .text-success ~ .btn-group .icon-move-up {
+        display: none;
+    }
+    .project .text-warning .icon-check {
+        display: none;
+    }
+    .project .kernel > div {
+        display: flex;
+        padding: 1em;
+    }
+    .project .kernel > div > div.btn-group {
+        margin-left: auto;
+    }
+    .project .libraries {
+        flex-grow: 3;
+        padding: 5px;
+        display: flex;
+        flex-direction: column
+    }
+    .project .libraries > div:first-child {
+        display: flex;
+        margin-bottom: 7px;
+        flex: 0 1 auto;
+    }
+    .project .libraries > div:first-child > h3 {
+        margin: auto 0;
+    }
+    .project .libraries > div:first-child > button {
+        margin-left: auto;
+    }
+    .libraries .list-group {
+        background-color: @app-background-color;
+        padding: 1em;
+        overflow-y: scroll;
+        flex: 1 1 auto;
+        margin-bottom: 10px;
+    }
+    .project .libraries .list-group .background-message {
+        text-align: center;
+        font-size: 2em;
+    }
+    .global > div {
+        display: flex;
+        flex-flow: row wrap;
+        align-content: space-between;
+        justify-content: space-between;
+    }
+    .global > div .kernel {
+        flex: 1 0 33%;
+        padding: 5px;
+    }
+    .global > div .libraries {
+        flex: 1 0 66%;
+        padding: 5px;
+    }
+    .global > div .depots {
+        flex: 1 0 100%;
+    }
+    .global h3 {
+        margin-top: 0;
+    }
+    .global {
+        table {
+            // padding: 1em;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            width: 100%;
+            table-layout: auto;
+            tbody {
+                background-color: @app-background-color;
+                overflow: auto;
+                max-height: 60px;
+            }
+            thead {
+                font-style: oblique;
+                color: @text-color-subtle;
+                background-color: @base-background-color;
+                display: table-header-group;
+            }
+            tr {
+                display: table-row;
+            }
+            tbody tr:hover {
+                background-color: @background-color-highlight;
+            }
+            tr >:nth-last-child(2),
+            tr >:nth-last-child(1) {
+                width: 25px;
+            }
+            tr >:nth-last-child(3) {
+                width: 100%;
+            }
+            td {
+                padding: 0 5px;
+                margin: 0 0;
+            }
+        }
+        .icon-trashcan:hover {
+            color: @text-color-error;
+            cursor: pointer;
+        }
+        .icon-cloud-download:hover {
+            color: @text-color-info;
+            cursor: pointer;
+        }
+        .depots table {
+            width: auto;
+            margin: 0 auto;
+            td {
+                width: auto;
+                min-width: 120px;
+            }
+            tr.selected-depot {
+                background-color: @background-color-selected;
+                color: @text-color-highlight;
+                font-weight: bold;
+            }
+        }
+        .depots label {
+          display: block;
+          padding: 2px 0;
+        }
+    }
 }
-
-.pros-conductor .header {
-  display: flex;
-  padding-left: auto;
-  padding-right: auto;
-  align-items: center;
-  justify-content: center;
-}
-
-.pros-conductor .header > svg {
-  height: 6em;
-  width: 6em;
-  margin: 10px;
-}
-
-.pros-conductor .header .title > h1 {
-  margin-bottom: 0.25em;
-}
-.pros-conductor .header .title > h2 {
-  font-style: italic;
-  margin-top: 0.25em;
-}
-
-.pros-conductor .error-presenter {
-  display: none;
-}
-.pros-conductor .error-presenter.enabled {
-  display: block;
-}
-.pros-conductor .error-presenter.enabled .background-message {
-  color: mix(@text-color-error, @text-color-subtle, 75%);
-  text-align: center;
-}
-.pros-conductor > .error-presenter.enabled ~ :not(.error-presenter):not(.header) {
-  display: none !important;
-}
-
-.pros-conductor .project, .pros-conductor .project-selector {
-  margin-top: 15px;
-}
-
-.pros-conductor .project-selector {
-  display: flex;
-}
-
-.pros-conductor .project-selector .recent-projects {
-  display: flex;
-  list-style-type: none;
-  padding-left: 0;
-  margin-bottom: 0;
-  overflow-x: auto;
-  min-width: 250px;
-}
-
-.pros-conductor .project-selector > * {
-  height: 4em;
-}
-.pros-conductor .project-selector .recent-projects > li {
-  margin-left: 5px;
-  padding: 4px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  border-radius: 2px;
-  border-color: 0;
-  border-width: 0px;
-}
-
-.pros-conductor .project-selector .recent-projects > .selected {
-  background-color: @background-color-selected;
-  font-weight: bold;
-}
-
-.pros-conductor .project-selector .recent-projects > li:hover {
-  background-color: @background-color-highlight;
-}
-
-.pros-conductor .project-selector .recent-projects > li > div {
-  align-self: center;
-}
-
-.pros-conductor .project-selector .recent-projects > li .name {
-  width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pros-conductor .project-selector .recent-projects > li .dir {
-  width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: @text-color-subtle;
-  text-align: left;
-  direction: rtl;
-}
-
-.pros-conductor .project.disabled {
-  visibility: collapse;
-}
-
-.pros-conductor .project > :first-child {
-  font-style: italic;
-}
-
-.pros-conductor .project > div > .loading {
-  display: none;
-}
-.pros-conductor .project.loading > div> .loading {
-  display: flex;
-  margin: 0 auto;
-}
-.pros-conductor .project.loading > div > div {
-  display: none;
-}
-.pros-conductor .project > div {
-  display: flex;
-  min-height: 11em;
-}
-
-.pros-conductor .project .kernel {
-  width: 33%;
-  padding: 5px;
-}
-.pros-conductor .project h3 {
-  margin-top: 0;
-}
-.pros-conductor .project .kernel > div > div {
-  display: flex;
-}
-.pros-conductor .project .text-success .icon-move-up {
-  display: none;
-}
-.pros-conductor .project .text-success ~ .btn-group .icon-move-up{
-  display: none;
-}
-.pros-conductor .project .text-warning .icon-check {
-  display: none;
-}
-
-.pros-conductor .project .kernel > div {
-  display: flex;
-  padding: 1em;
-}
-
-.pros-conductor .project .kernel > div > div.btn-group {
-  margin-left: auto;
-}
-
-.pros-conductor .project .libraries {
-  width: 66%;
-  padding: 5px;
-  display: flex;
-  flex-direction: column
-}
-.pros-conductor .project .libraries > div:first-child {
-  display: flex;
-  margin-bottom: 7px;
-  flex: 0 1 auto;
-}
-.pros-conductor .project .libraries > div:first-child > h3 {
-  margin: auto 0;
-}
-.pros-conductor .project .libraries > div:first-child > button {
-  margin-left: auto;
-}
-.pros-conductor .project .libraries .list-group {
-  background-color: @app-background-color;
-  padding: 1em;
-  overflow-y: scroll;
-  flex: 1 1 auto;
-  margin-bottom: 10px;
-}
-.pros-conductor .project .libraries .list-group .background-message {
-  text-align: center;
-  font-size: 2em;
-}
-
-
 // CORNER RIBBON for BETA
 .wrapper {
-  margin: 50px auto;
-  width: 280px;
-  height: 370px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 0px 8px rgba(0,0,0,0.3);
-  position: relative;
-  z-index: 90;
+    margin: 50px auto;
+    width: 280px;
+    height: 370px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 90;
 }
-
 .ribbon-wrapper {
-  width: 85px;
-  height: 88px;
-  overflow: hidden;
-  position: absolute;
-  top: -3px;
-  right: -3px;
+    width: 85px;
+    height: 88px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
-
 .ribbon {
-  font: bold 15px Sans-Serif;
-  color: #333;
-  text-align: center;
-  text-shadow: rgba(255,255,255,0.5) 0px 1px 0px;
-  -webkit-transform: rotate(45deg);
-  position: relative;
-  padding: 7px 0;
-  left: -5px;
-  top: 15px;
-  width: 120px;
-  background-image: -webkit-linear-gradient(top, #E7BC70, #D2AB67);
-  color: #2F2D29;
-  box-shadow:         0px 0px 3px rgba(0,0,0,0.3);
+    font: bold 15px Sans-Serif;
+    color: #333;
+    text-align: center;
+    text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;
+    -webkit-transform: rotate(45deg);
+    position: relative;
+    padding: 7px 0;
+    left: -5px;
+    top: 15px;
+    width: 120px;
+    background-image: -webkit-linear-gradient(top, #E7BC70, #D2AB67);
+    color: #2F2D29;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
 }

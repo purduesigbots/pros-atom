@@ -80,7 +80,7 @@ module.exports =
           cliVer = @cliVersion[0].textContent = 'Not found'
           @cliVersion.addClass 'badge-error'
         ), cli.baseCommand '--version'
-      pkgVer = @pkgVersion[0].textContent = require('../../package.json').version
+      pkgVer = @pkgVersion[0].textContent = atom.packages.getLoadedPackage('pros').metadata.version
       @versions[0].onclick = -> atom.clipboard.write "PROS CLI: #{cliVer} - Package: #{pkgVer}"
 
       @subscriptions.add atom.tooltips.add @gaInput,

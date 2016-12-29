@@ -69,6 +69,28 @@
   margin: 5px;
 }
 
+.pros-message {
+  text-align: center;
+  font-weight: bold;
+  color: @text-color-subtle;
+}
+.pros-message.error-presenter {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 50px;
+  background-color: fade(@background-color-warning, 7%);
+  border-radius: 5px;
+  border-color: @background-color-error;
+  border-width: thin;
+  border-style: solid;
+  color: @text-color;
+}
+.pros-message.error-presenter .background-message {
+  color: mix(@text-color-error, @text-color-subtle, 75%);
+  text-align: center;
+}
+
 
 .icon-file-text[data-name$=".pros"]::before,
 .icon-file-binary[data-name$=".pros"]:before,

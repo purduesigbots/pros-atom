@@ -36,13 +36,14 @@ module.exports =
       command += '.exe'
 
     handleLintOutput = (code, output) ->
-      regex = "(?<file>.+):(?<line>\\d+):(?<col>\\d+):\\s*\\w*\\s*" +
-        "(?<type>(error|warning|note)):\\s*(?<message>.*)"
-      msgs = linthelp.parse output, regex
-      msgs.filter((entry) -> entry.filePath == lintable_file) \
-        .forEach (entry) -> entry.filePath = real_file
-      module.exports.messages[real_file] = msgs
-      module.exports.linter?.setMessages?(msgs)
+      if code == 0 and output
+        regex = "(?<file>.+):(?<line>\\d+):(?<col>\\d+):\\s*\\w*\\s*" +
+          "(?<type>(error|warning|note)):\\s*(?<message>.*)"
+        msgs = linthelp.parse output, regex
+        msgs.filter((entry) -> entry.filePath == lintable_file) \
+          .forEach (entry) -> entry.filePath = real_file
+        module.exports.messages[real_file] = msgs
+        module.exports.linter?.setMessages?(msgs)
 
     commandExists command, (err, commandDoesExist) =>
       if err
