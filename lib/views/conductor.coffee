@@ -17,14 +17,12 @@ module.exports =
       @div class: 'pros-conductor-parent', =>
         @div class: 'ribbon-wrapper', =>
           @div class: 'ribbon', => @raw 'BETA'
-        @div class: "pros-conductor", =>
+        @div class: "pros-conductor", outlet: 'conductorDiv', =>
           @div class: "header", =>
             @raw brand.tuxFullColor
             @div class: "title", =>
               @h1 'PROS Conductor'
               @h2 'Project Management'
-
-          std.errorPresenter.call @, outlet: 'conductorErrorInfo'
 
           @div class: "project-selector", =>
             @button class: 'btn btn-primary icon icon-file-directory-create inline-block-tight',
@@ -33,11 +31,9 @@ module.exports =
             outlet: 'addExisting', => @raw 'Add Existing'
             @ul class: 'recent-projects', outlet: 'projectSelector'
 
-          @div class: "project loading", outlet: 'projectDiv', =>
+          @div class: "project", outlet: 'projectDiv', =>
             @h2 outlet: 'projectHeader'
             @div =>
-              @span outlet: 'projectLoading', class: 'loading loading-spinner-large inline-block'
-              std.errorPresenter.call @, outlet: 'projectErrorInfo'
               @div class: 'kernel', =>
                 @h3 'Kernel'
                 @div =>
@@ -54,7 +50,8 @@ module.exports =
                   @button class: 'inline-block-tight btn icon icon-file-add',
                   outlet: 'addLibraryButton', => @raw 'Add'
                 @ul class: 'list-group', outlet: 'projectLibraries'
-          @div class: 'global', =>
+          @hr()
+          @div class: 'global', outlet: 'globalDiv', =>
             @h2 'Global Configuration'
             @div =>
               @div class: 'kernel', outlet: 'globalKernelsDiv', =>
@@ -129,17 +126,27 @@ module.exports =
       super
       @subscriptions = new CompositeDisposable
 
-      @subscriptions.add atom.tooltips.add @conductorErrorInfo[0], title: 'Copy Message'
-      @conductorErrorInfo.on 'click', => atom.clipboard.write @conductorErrorInfo.text()
+      # @subscriptions.add atom.tooltips.add @conductorErrorInfo[0], title: 'Copy Message'
+      # @conductorErrorInfo.on 'click', => atom.clipboard.write @conductorErrorInfo.text()
 
-      @subscriptions.add atom.tooltips.add @projectErrorInfo[0], title: 'Copy Message'
-      @projectErrorInfo.on 'click', => atom.clipboard.write @projectErrorInfo.text()
+      # @subscriptions.add atom.tooltips.add $('.pros-conductor.pros-message'), title: 'Copy Message'
+      # $('.pros-conductor.pros-message').on 'click', (e) ->
+      #   msg = $(e.target).closest '.pros-message'
+      #   atom.clipboard.write msg.text()
+      # @subscriptions.add atom.tooltips.add @projectErrorInfo[0], title: 'Copy Message'
+      # @projectErrorInfo.on 'click', => atom.clipboard.write @projectErrorInfo.text()
+
+      std.applyLoading @globalDiv
+      std.applyLoading @projectDiv
+
       proscli.checkCli minVersion: '2.4.1', fmt: 'html', cb: (c, o) =>
         if c != 0
-          @conductorErrorInfo.addClass 'enabled'
-          @conductorErrorInfo.children('div').html o
+          @subscriptions.add td.addMessage @conductorDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
+          # @conductorErrorInfo.addClass 'enabled'
+          # @conductorErrorInfo.children('div').html o
           return
-        @conductorErrorInfo.removeClass 'enabled'
+        std.clearMessages @conductorDiv
+        # @conductorErrorInfo.removeClass 'enabled'
         @on 'click', '.recent-projects > li', (e) => @updateSelectedPath $(e.target).closest('li').data 'path'
 
         @initializeGlobalListing()
@@ -167,7 +174,7 @@ module.exports =
         @updateAvailableProjects()
         activeProject ?= atom.project.getPaths()?[0]
         @updateSelectedPath activeProject
-
+        std.removeLoading @globalDiv
         @updateGlobalListing()
 
     updateAvailableProjects: ->
@@ -205,12 +212,13 @@ module.exports =
       # if @selected?.data('path') == oldPath then return
       @activeProject = project = @selected.data 'path'
       @projectHeader.text "#{path.basename project} (#{project})"
-      @projectDiv.addClass 'loading'
+      std.applyLoading @projectDiv
 
       proscli.execute cmd: ['pros', 'conduct', 'info-project', project, '--machine-output'], cb: (c, o, e) =>
         if c == 0
           info = (JSON.parse e) for e in o?.split(/\r?\n/).filter(Boolean)
-          @projectErrorInfo.parent().removeClass 'enabled'
+          std.clearMessages @projectDiv
+          # @projectErrorInfo.parent().removeClass 'enabled'
           # set active project again in case user starts clicking between projects quickly
           @activeProject = project = @selected.data 'path'
           @projectHeader.text "#{path.basename project} (#{project})"
@@ -229,16 +237,17 @@ module.exports =
               @projectLibraries.append @libItem n, v.version, v.latest
           else
             @projectLibraries.append "<ul class='background-message'>No libraries added</ul>"
-          @projectDiv.removeClass 'loading'
+          std.removeLoading @projectDiv
         else
           console.log {c, o, e}
-          div = @projectErrorInfo.children('div')
-          div.empty()
-          for line in "STDOUT:\n#{o}\n\nERR:\n#{e}".split '\n'
-            div.append document.createTextNode line
-            div.append '<br/>'
-          @projectErrorInfo.addClass 'enabled'
-          @projectDiv.removeClass 'loading'
+          # div = @projectErrorInfo.children('div')
+          # div.empty()
+          # for line in "STDOUT:\n#{o}\n\nERR:\n#{e}".split '\n'
+          #   div.append document.createTextNode line
+          #   div.append '<br/>'
+          # @projectErrorInfo.addClass 'enabled'
+          std.removeLoading @projectDiv
+          @subscriptions.add std.addMessage @projectDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
 
 
     initializeGlobalListing: ->
@@ -265,28 +274,31 @@ module.exports =
 
     updateGlobalListing: ->
       std.applyLoading @globalLibraryDiv
+      std.applyLoading @globalKernelsDiv
+      std.applyLoading @globalDepotDiv
       proscli.execute {
         cmd: ['pros', 'conduct', 'lstemplate', '--kernels', '--machine-output'],
         cb: (c, o, e) =>
-          @globalKernelsDiv.removeClass 'loading'
+          std.removeLoading @globalKernelsDiv
           if c == 0
             listing = []
             for e in o?.split(/\r?\n/).filter(Boolean)
               try
                 listing = listing.concat JSON.parse e
               catch err
-                std.addMessage @globalKernelsDiv, "Error parsing: #{e} (#{err})", nohide: true
+                @subscriptions.add std.addMessage @globalKernelsDiv, "Error parsing: #{e} (#{err})",
+                  nohide: true
             # listing = (try JSON.parse e catch error ) for e in o?.split(/\r?\n/).filter(Boolean)
             @globalKernels.empty()
             if listing.length == 0
-              std.addMessage @globalKernelsDiv,
+              @subscriptions.add std.addMessage @globalKernelsDiv,
                 "You don't have any depots which provide kernels.
                 Add a depot that provides depots to get started."
             else
               for {version, depot, offline, online} in listing
                 @globalKernels.append @globalKernelItem version, depot, offline, online
           else
-            std.addMessage @globalLibraryDiv,
+            @subscriptions.add std.addMessage @globalLibraryDiv,
               "There was an error fetching the kernels listing:<br/>#{o}<br/>#{e}",
               error: true
       }
@@ -300,17 +312,17 @@ module.exports =
               try
                 listing = listing.concat JSON.parse e
               catch err
-                std.addMessage @globalLibraryDiv, "Error parsing: #{e} (#{err})", nohide: true
+                @subscriptions.add std.addMessage @globalLibraryDiv, "Error parsing: #{e} (#{err})", nohide: true
             @globalLibraries.empty()
             if listing.length == 0
-              std.addMessage @globalLibraryDiv,
+              @subscriptions.add std.addMessage @globalLibraryDiv,
                 "You don't have any depots which provide libraries.<br/>
                 Add a depot that provides depots to get started."
             else
               for {library, version, depot, offline, online} in listing
                 @globalLibraries.append @globalLibraryItem library, version, depot, offline, online
           else
-            std.addMessage @globalLibraryDiv,
+            @subscriptions.add std.addMessage @globalLibraryDiv,
               "There was an error fetching the libraries listing:
               <br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
               error: true
@@ -324,10 +336,10 @@ module.exports =
             try
               listing = listing.concat JSON.parse o
             catch err
-              std.addMessage @globalDepotDiv, "Error parsing: #{e} (#{err})", nohide: true
+              @subscriptions.add std.addMessage @globalDepotDiv, "Error parsing: #{e} (#{err})", nohide: true
             @globalDepots.empty()
             if listing.length == 0
-              std.addMessage @globalDepotDiv,
+              @subscriptions.add std.addMessage @globalDepotDiv,
                 "You don't have any depots configured. Run
                 <span class='inline-block highlight'>pros conduct first-run</span> to automatically set up
                 the default PROS depot, or restart Atom and it will be automatically configured for you.",
@@ -336,7 +348,7 @@ module.exports =
               for depot in listing
                 @globalDepots.append @globalDepotItem depot
           else
-            std.addMessage @globalDepotDiv,
+            @subscriptions.add std.addMessage @globalDepotDiv,
               "There was an error fetching the configured depots:
               <br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
               error: true

@@ -20,7 +20,7 @@ module.exports =
 
   addMessage: (element, message, settings={}) ->
     if not settings?.nohide
-      element.children().not(element.children ':header').hide()
+      element.children().not(element.children ':header').not(element.children '.header').hide()
     div = $('<div></div>')
     element.append div
     div.addClass 'pros-message'
@@ -28,7 +28,10 @@ module.exports =
       div.addClass 'error-presenter'
       div.append '<ul class="background-message error-messages">Error!</ul>'
     div.append message
+    subscription = atom.tooltips.add div, title: 'Copy Text'
+    div.click -> atom.clipboard.write div.text()
+    return subscription
 
   clearMessages: (element) ->
     element.children('.pros-message').remove()
-    element.children.show()
+    element.children().show()

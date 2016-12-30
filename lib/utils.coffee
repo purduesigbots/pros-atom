@@ -10,7 +10,6 @@ module.exports =
     return @cliVersion
 
   pkgVersion: =>
-    console.log "func: #{@pkgVersion}"
     return @pkgVersion
 
   findRoot: (_path, n = 10) ->
