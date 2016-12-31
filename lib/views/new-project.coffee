@@ -1,7 +1,8 @@
+{CompositeDisposable} = require 'atom'
 {$, View, TextEditorView} = require 'atom-space-pen-views'
 fs = require 'fs'
 path = require 'path'
-cli = require '../cli'
+{prosConduct} = cli = require '../proscli'
 
 module.exports =
   class NewProjectModal extends View
@@ -14,7 +15,7 @@ module.exports =
             @button class: 'btn btn-default', outlet: 'openDir', =>
               @span class: 'icon icon-ellipsis'
             @subview 'projectPathEditor', new TextEditorView mini: true
-        @div class: 'kernel-selector', =>
+        @div class: 'kernel-selector', outlet: 'kernelSelector', =>
           @h4 'Choose a kernel:'
           @select class: 'input-select', outlet: 'kernelsList', =>
             @option class: 'temp', 'Loading...'
@@ -24,7 +25,8 @@ module.exports =
             @button outlet: 'createButton', class: 'btn btn-primary icon icon-rocket', 'Create'
           @span class: 'loading loading-spinner-tiny'
 
-    initialize: ({dir}={}) ->
+    initialize: ({dir, @cb}={}) ->
+      @subscriptions = new CompositeDisposable
       atom.keymaps.add 'new-project-keymap',
         '.pros-new-project':
           'escape': 'core:cancel'
@@ -43,18 +45,20 @@ module.exports =
         if dir = @projectPathEditor.getText()
           template = JSON.parse @kernelsList.val()
           $(@element).find('.actions').addClass 'working'
-          cli.createNewExecute(((c,o) =>
-            @cancel() # destroy the modal
-            if c is 0
-              atom.notifications.addSuccess 'Created a new project', detail: o
-              atom.project.addPath dir
-              firstPath = path.join dir, 'src', 'opcontrol.c'
-              fs.exists firstPath, (exists) -> if exists then atom.workspace.open firstPath, pending: true
-            else
-              atom.notifications.addError 'Failed to create project',
-                detail: o
-                dismissable: true
-            ), "\"#{dir}\"", template.version, template.depot)
+          cli.execute {
+            cmd: prosConduct 'new', dir, template.version, template.depot
+            cb: (c, o, e) =>
+              @cancel true # destroy the modal
+              if c is 0
+                atom.notifications.addSuccess 'Created a new project', detail: o
+                atom.project.addPath dir
+                firstPath = path.join dir, 'src', 'opcontrol.c'
+                fs.exists firstPath, (exists) -> if exists then atom.workspace.open firstPath, pending: true
+              else
+                atom.notifications.addError 'Failed to create project',
+                  detail: "OUT:\n#{o}\n\nERR:#{e}"
+                  dismissable: true
+            }
 
       @cancelButton.click => @cancel()
 
@@ -66,17 +70,39 @@ module.exports =
       @panel.show()
       @projectPathEditor.focus()
 
-      cli.getTemplates ((code, result) =>
-        @kernelsList.children().last().remove()
-        result.forEach (kernel) =>
-          option = document.createElement 'option'
-          option.value = JSON.stringify kernel
-          option.innerHTML = "#{kernel.version} from #{kernel.depot}"
-          @kernelsList.append option
-        ), '--offline-only --kernels'
+      cli.execute {
+        cmd: prosConduct 'ls-template', '--kernels', '--offline-only', '--machine-output'
+        cb: (c, o, e) =>
+          if c != 0
+            @subscriptions.add std.addMessage @kernelSelector,
+              "Error obtaining the list of kernels downloaded.<br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
+              error: true, nohide: true
+            return
+          try
+            listing = JSON.parse o
+          catch error
+            @subscriptions.add std.addMessage @kernelSelector,
+              "Error parsing the list of downloaded kernels (#{o}).<br/>#{error}", error: true, nohide: true
+            return
+          if listing.length == 0
+            @subscriptions.add std.addMessage @kernelSelector,
+              "You don't have any downloaded kernels.<br/>
+              Visit <a>Conductor</a> to download some.", nohide: true
+            @kernelsList.find('a').on 'click', =>
+              @cancel()
+              atom.workspace.open 'pros://conductor'
+            return
+          @kernelsList.children().last().remove()
+          listing.forEach (kernel) =>
+            option = document.createElement 'option'
+            option.value = JSON.stringify kernel
+            option.innerHTML = "#{kernel.version} from #{kernel.depot}"
+            @kernelsList.append option
+        }
 
-    cancel: =>
+    cancel: (cancel=false)=>
       @panel?.hide()
       @panel?.destroy()
       @panel = null
       atom.workspace.getActivePane().activate()
+      @cb? cancel, @projectPathEditor.getText()

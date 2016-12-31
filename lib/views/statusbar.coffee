@@ -1,18 +1,52 @@
 {CompositeDisposable} = require 'atom'
 {$, View} = require 'atom-space-pen-views'
 
-module.exports =
-  class StatusBar extends View
-    @content: ->
-      @div class: 'pros-status-bar inline-block', =>
-        # coffeelint: disable=max_line_length
-        @button class: 'btn btn-default', outlet: 'button', => @raw "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\" viewBox=\"0 0 100 100\" enable-background=\"new 0 0 100 100\" xml:space=\"preserve\"><g><polygon fill-rule=\"evenodd\" clip-rule=\"evenodd\" points=\"79.025,41.379 94.225,54.536 50.113,92.98 50.113,92.957	50.027,93.032 6.107,54.751 21.328,41.485 50.141,83.744 	\"/><polygon fill-rule=\"evenodd\" clip-rule=\"evenodd\" points=\"28.152,28.248 29.031,29.714 71.25,29.714 72.129,28.248\"/><polygon fill-rule=\"evenodd\" clip-rule=\"evenodd\"  points=\"38.119,56.539 33.137,42.027 18.916,34.111 	\"/><polygon fill-rule=\"evenodd\" clip-rule=\"evenodd\" points=\"62.16,56.687 67.291,42.027 81.217,34.258 	\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\"  d=\"M50.141,8.605L12.76,25.463h13.438l2.834,4.251H71.25l2.834-4.251		H87.52L50.141,8.605zM53.072,18.866l-2.932,1.466l-2.932-1.466v-2.932l2.932-1.466l2.932,1.466V18.866z\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M80.496,34.111H19.783l0.121,0.148l18.51,2.783l-0.295,19.496		l-2.37-2.769L49.408,70.59V52.289c0-0.294,0.293-0.587,0.586-0.587h0.293c0.293,0,0.586,0.293,0.586,0.587V70.59L62.24,56.592	l-0.08,0.095l-0.293-19.644l18.398-2.648L80.496,34.111z M50.141,48.771c-0.648,0-1.174-0.524-1.174-1.173		c0-0.647,0.525-1.173,1.174-1.173c0.646,0,1.172,0.525,1.172,1.173C51.313,48.246,50.787,48.771,50.141,48.771z M50.141,43.787		c-0.648,0-1.174-0.525-1.174-1.174c0-0.647,0.525-1.173,1.174-1.173c0.646,0,1.172,0.525,1.172,1.173		C51.313,43.262,50.787,43.787,50.141,43.787z M50.141,38.655c-0.648,0-1.174-0.524-1.174-1.172s0.525-1.173,1.174-1.173		c0.646,0,1.172,0.525,1.172,1.173S50.787,38.655,50.141,38.655z\"/></g></svg>"
-# coffeelint: enable=max_line_length
+class StatusBar extends View
+  @content: ->
+    @div class: 'pros-status-bar inline-block', =>
+      # coffeelint: disable=max_line_length
+      @button class: 'btn btn-default', outlet: 'button',
+        => @raw "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\">
+  <defs>
+    <g id=\"logo\">
+      <polygon points=\"79 41.4 94.2 54.5 50.1 93 50.1 93 50 93 6.1 54.8 21.3 41.5 50.1 83.7 \"/>
+      <polygon points=\"28.2 28.2 29 29.7 71.3 29.7 72.1 28.2\"/>
+      <polygon points=\"38.1 56.5 33.1 42 18.9 34.1 \"/>
+      <polygon points=\"62.2 56.7 67.3 42 81.2 34.3 \"/>
+      <path d=\"M50.1 8.6L12.8 25.5h13.4l2.8 4.3H71.3l2.8-4.3H87.5L50.1 8.6zM53.1 18.9l-2.9 1.5 -2.9-1.5v-2.9l2.9-1.5 2.9 1.5V18.9z\"/>
+      <path d=\"M80.5 34.1H19.8l0.1 0.1 18.5 2.8 -0.3 19.5 -2.4-2.8L49.4 70.6V52.3c0-0.3 0.3-0.6 0.6-0.6h0.3c0.3 0 0.6 0.3 0.6 0.6V70.6L62.2 56.6l-0.1 0.1 -0.3-19.6 18.4-2.6L80.5 34.1zM50.1 48.8c-0.6 0-1.2-0.5-1.2-1.2 0-0.6 0.5-1.2 1.2-1.2 0.6 0 1.2 0.5 1.2 1.2C51.3 48.2 50.8 48.8 50.1 48.8zM50.1 43.8c-0.6 0-1.2-0.5-1.2-1.2 0-0.6 0.5-1.2 1.2-1.2 0.6 0 1.2 0.5 1.2 1.2C51.3 43.3 50.8 43.8 50.1 43.8zM50.1 38.7c-0.6 0-1.2-0.5-1.2-1.2s0.5-1.2 1.2-1.2c0.6 0 1.2 0.5 1.2 1.2S50.8 38.7 50.1 38.7z\"/>
+    </g>
+  </defs>
+  <use xlink:href=\"#logo\"/>
+  <g id='overlay'><use xlink:href='#logo'/></g>
+</svg>"
+      # coffeelint: enable=max_line_length
 
-    initialize: (@statusBarProvider) ->
-      @button[0].firstChild.onclick = @button.onclick = ->
-        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()),
-          'PROS:Toggle-PROS'
-      @attach()
+  tooltip: null
+  btn: null
+  initialize: () ->
+    @button.onclick = ->
+      atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()),
+        'PROS:Toggle-PROS'
+    @btn = @button[0] # cache the lookup
+    @tooltip = atom.tooltips.add @button, title: 'Click to disable PROS editor components'
 
-    attach: -> @statusBarProvider.addRightTile(item: this, priority: -10)
+  attach: (provider) -> provider.addRightTile(item: this, priority: -10)
+
+  count: 0
+  working: () ->
+    if @count == 0
+      @button.addClass 'animate'
+      @tooltip?.dispose()
+      @tooltip = atom.tooltips.add @button,
+        title: 'Running PROS CLI tasks in the background.<br/>Click to disable PROS editor components'
+    @count += 1
+
+  stop: (uid=0) ->
+    @count -= 1
+    if @count == 0
+      @button.removeClass 'animate'
+      @tooltip?.dispose()
+      @tooltip = atom.tooltips.add @button, title: 'Click to disable PROS editor components'
+
+module.exports = new StatusBar

@@ -1,17 +1,41 @@
-.pros-status-bar svg {
-  height: @component-icon-size;
-  width: @component-icon-size;
-  text-align: center;
-  fill: @text-color-subtle;
-}
-.pros-status-bar .btn.btn-default,  .pros-status-bar .btn.btn-default:hover,  .pros-status-bar .btn.btn-default:focus {
-  background: none;
-  border: none;
-  height: @component-line-height;
-  margin-top: 4px;
-  padding: 0;
-}
 
-.pros-status-bar .btn.btn-default:hover svg  {
-  fill: #cca352;
+.pros-status-bar {
+  svg {
+    height: @component-icon-size;
+    width: @component-icon-size;
+    text-align: center;
+  }
+  .btn.btn-default,
+  .btn.btn-default:hover,
+  .btn.btn-default:focus {
+    background: none;
+    border: none;
+    height: @component-line-height;
+    margin-top: 4px;
+    padding: 0;
+  }
+  .btn svg {
+    fill: @text-color-subtle;
+    transition: fill 0.5s;
+    #overlay {
+      fill: white;
+      opacity: 0;
+    }
+  }
+  .btn:hover svg {
+    fill: #cca352;
+  }
+  .btn.animate svg #overlay {
+    animation: 1.25s ease-in 0s infinite alternate shine;
+    @keyframes shine {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 0.75;
+      }
+    }
+  }
+  .btn.animate:hover svg {
+  }
 }

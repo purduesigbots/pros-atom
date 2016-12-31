@@ -1,7 +1,5 @@
 {CompositeDisposable} = require 'atom'
-{NewProjectView} = require './views/new-project/new-project-view'
 {RegisterProjectView} = require './views/register-project/register-project-view'
-{UpgradeProjectView} = require './views/upgrade-project/upgrade-project-view'
 # {`TerminalView`} = require './views/terminal/terminal-view'
 {Disposable} = require 'atom'
 fs = require 'fs'
@@ -15,7 +13,7 @@ config = require './config'
 universalConfig = require './universal-config'
 autocomplete = require './autocomplete/autocomplete-clang'
 buttons = require './buttons'
-StatusBar = require './views/statusbar'
+Status = require './views/statusbar'
 utils = require './utils'
 
 WelcomeView = null
@@ -55,21 +53,19 @@ module.exports =
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
       lint.activate()
       autocomplete.activate()
-      @newProjectViewProvider = NewProjectView.register
-      @newProjectPanel = new NewProjectView
 
       @registerProjectViewProvider = RegisterProjectView.register
       @registerProjectPanel = new RegisterProjectView
-
-      @upgradeProjectViewProvider = UpgradeProjectView.register
-      @upgradeProjectPanel = new UpgradeProjectView
 
       @subscriptions.add atom.deserializers.add
         name: 'ProsWelcomeView'
         deserialize: (state) -> createWelcomeView state
 
       atom.commands.add 'atom-workspace', 'PROS:New-Project': -> new (require './views/new-project')
-      atom.commands.add 'atom-workspace', 'PROS:Upgrade-Project': => @upgradeProject()
+      atom.commands.add 'atom-workspace', 'PROS:Upgrade-Project': ->
+        currentProject = atom.project.relativizePath atom.workspace.getActiveTextEditor()?.getPath()
+        if currentProject[0] then new ( require './views/upgrade-project') dir: currentProject[0]
+        else new (require './views/upgrade-project')
       atom.commands.add 'atom-workspace', 'PROS:Register-Project': => @registerProject()
       atom.commands.add 'atom-workspace', 'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace', 'PROS:Toggle-Terminal': => @toggleTerminal()
@@ -115,6 +111,8 @@ module.exports =
                 e.setGrammar grammar
 
   deactivate: ->
+    @statusBarTile?.destroy()
+    @statusBarTile = null
     # End client session
     if atom.config.get('pros.googleAnalytics.enabled') and \
        atom.config.get('core.telemetryConsent') is 'limited'
@@ -143,14 +141,7 @@ module.exports =
         (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
           atom.project.getPaths()[0]) + '"'
 
-  newProject: ->
-    @newProjectPanel.toggle()
-
-  registerProject: ->
-    @registerProjectPanel.toggle()
-
-  upgradeProject: ->
-    @upgradeProjectPanel.toggle()
+  registerProject: -> @registerProjectPanel.toggle()
 
   toggleTerminal: -> cli.serialInTerminal()
 
@@ -159,13 +150,11 @@ module.exports =
     buttons.addButtons @toolBar
     @toolBar.onDidDestroy => @toolBar = null
 
-  autocompleteProvider: ->
-    autocomplete.provide()
+  autocompleteProvider: -> autocomplete.provide()
 
   consumeStatusBar: (statusbar) ->
-    @statusBarTile = new StatusBar(statusbar)
+    Status.attach(statusbar)
 
-  deserializeConductorView: (data) ->
-    ConductorView ?= new (require('./views/conductor')) data
+  deserializeConductorView: (data) -> ConductorView ?= new (require('./views/conductor')) data
 
   config: universalConfig.filterConfig config.config, 'atom'

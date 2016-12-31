@@ -4,6 +4,9 @@ fs = require 'fs'
 path = require 'path'
 cli = require '../cli'
 utils = require '../utils'
+proscli = require '../proscli'
+{prosConduct} = proscli
+std = require './standard'
 
 module.exports =
   class AddLibraryModal extends View
@@ -32,6 +35,7 @@ module.exports =
 
 
     initialize: ({_path, @cb}={}) ->
+      @subscriptions ?= new CompositeDisposable
       atom.keymaps.add 'add-library-keymap',
         '.pros-add-library':
           'escape': 'core:cancel'
@@ -64,55 +68,86 @@ module.exports =
       @projectPathEditor.getModel().onDidChange =>
         updateDisable()
         if fs.existsSync path.join @projectPathEditor.getText(), 'project.pros'
-          cli.projectInfo(((c, info) =>
-            if Object.keys(info.libraries).some((k) -> info.libraries.hasOwnProperty k)
-              for n, v of info.libraries
-                @libraryList.children('.primary-line.icon-check').removeClass 'icon icon-check'
-                for child in @libraryList.children()
-                  value = $(child).data 'value'
-                  if value?.library == n and value?.version == v.version
-                    $(child).children('.primary-line').addClass 'icon icon-check'
-            ), @projectPathEditor.getText())
+          proscli.execute {
+            cmd: prosConduct('info-project', @projectPathEditor.getText()),
+            cb: (c, o, e) =>
+              if c != 0 then return
+              info = {}
+              try
+                info = JSON.parse o
+              catch error
+                console.log error
+                return
+              if Object.keys(info.libraries).some((k) -> info.libraries.hasOwnProperty k)
+                for n, v of info.libraries
+                  @libraryList.children('.primary-line.icon-check').removeClass 'icon icon-check'
+                  for child in @libraryList.children()
+                    value = $(child).data 'value'
+                    if value?.library == n and value?.version == v.version
+                      $(child).children('.primary-line').addClass 'icon icon-check'
+          }
 
       @addButton.click =>
-        if dir = @projectPathEditor.getText()
-          if template = @selected.data 'value'
-            $(@element).find('.actions').addClass 'working'
-            cli.addLibraryExecute(((c, o) =>
-              @cancel(true) # destroy the modal
-              if c is 0
-                atom.notifications.addSuccess "Added #{template.library} to #{path.basename dir}", detail: o
-                atom.project.addPath dir
-              else
-                atom.notifications.addError "Failed to add #{template.library} to #{path.basename dir}",
-                  detail: o
-                  dismissable: true
-            ), "\"#{dir}\"", template.library, template.version, template.depot)
+        dir = @projectPathEditor.getText()
+        template = @selected.data 'value'
+        $(@element).find('.actions').addClass 'working'
+        proscli.execute {
+          cmd: prosConduct 'new-lib', "\"#{dir}\"", template.library, template.version, template.depot
+          cb: (c, o, e) =>
+            @cancel true
+            if c == 0
+              atom.notifications.addSuccess "Added #{template.library} to #{path.basename dir}", detail: o
+              atom.project.addPath dir
+            else
+              atom.notifications.addError "Failed to add #{template.library} to #{path.basename dir}",
+                detail: o
+                dismissable: true
+        }
 
       if !!_path then @projectPathEditor.setText _path
       @panel.show()
       @projectPathEditor.focus()
 
-      cli.getTemplates(((c, o) =>
-        @libraryList.empty()
-        for {library, version, depot} in o
-          li = document.createElement 'li'
-          li.className = 'two-lines library-option'
-          li.setAttribute 'data-value', JSON.stringify {library, version, depot}
-          li.innerHTML = "
-          <div class='primary-line'>#{library}</div>
-          <div class='secondary-line'><em>version</em> #{version} <em>from</em>
-          #{depot}</div>"
-          @libraryList.append li
-
-        $('li.library-option').on 'click', (e) =>
-          @selected?.removeClass 'selected'
-          @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
-          @selected = $(e.target).closest 'li.library-option'
-          updateDisable()
-          @selected.addClass 'selected'
-          @selected.children('.primary-line').addClass 'icon icon-chevron-right'
-        ), '--offline-only --libraries')
+      proscli.execute {
+        cmd: prosConduct 'ls-template', '--libraries', '--offline-only', '--machine-output'
+        cb: (c, o, e) =>
+          @libraryList.empty()
+          if c != 0
+            @subscriptions.add std.addMessage @libraryList,
+              "Error obtaining the list of libraries downloaded.<br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
+              error: true
+            return
+          try
+            listing = JSON.parse o
+          catch error
+            @subscriptions.add std.addMessage @libraryList,
+              "Error parsing the list of downloaded libraries (#{o}).<br/>#{error}", error: true
+            return
+          if listing.length == 0
+            @subscriptions.add std.addMessage @libraryList,
+              "You don't have any downloaded libraries.<br/>
+              Visit <a>Conductor</a> to download some."
+            @libraryList.find('a').on 'click', =>
+              @cancel()
+              atom.workspace.open 'pros://conductor'
+            return
+          for {library, version, depot} in listing
+            li = document.createElement 'li'
+            li.className = 'two-lines library-option'
+            li.setAttribute 'data-value', JSON.stringify {library, version, depot}
+            li.innerHTML = "
+            <div class='primary-line'>#{library}</div>
+            <div class='secondary-line'><em>version</em> #{version} <em>from</em>
+            #{depot}</div>"
+            li.click = =>
+              @selected?.removeClass 'selected'
+              @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
+              @selected = $(e.target).closest 'li.library-option'
+              updateDisable()
+              @selected.addClass 'selected'
+              @selected.children('.primary-line').addClass 'icon icon-chevron-right'
+            @libraryList.append li
+      }
 
     cancel: (complete=false)->
       @panel?.hide()

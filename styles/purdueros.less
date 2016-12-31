@@ -18,29 +18,6 @@
   margin: 2em;
 }
 
-.pros-new-project-view select {
-  margin: 10px 20%;
-  width: 60%;
-  background-color: @input-background-color;
-  border-color: @input-border-color;
-  color: @text-color;
-}
-
-#pros-directory-selector div .btn, #pros-directory-selector div atom-text-editor {
-  display: inline-block;
-  vertical-align: middle;
-}
-#pros-directory-selector div atom-text-editor {
-  width: 89%;
-  margin-bottom: 0;
-}
-#pros-directory-selector div .btn {
-  width: 7%;
-  margin: 1%;
-  text-align: center;
-  padding: 0;
-}
-
 .btn.btn-bottom {
   height: 3.5em;
   padding: 0 1.5em;
@@ -76,6 +53,7 @@
   text-align: center;
   font-weight: bold;
   color: @text-color-subtle;
+  margin: 5px;
 }
 .pros-message.error-presenter {
   display: flex;
@@ -95,7 +73,8 @@
 }
 
 
-.icon-file-text[data-name$=".pros"]::before,
+.list-tree span.icon[data-name$=".pros"]::before, // Update for file-icons 2.0.1
+.icon-file-text[data-name$=".pros"]:before,
 .icon-file-binary[data-name$=".pros"]:before,
 .theme-flatland-dark-ui .icon-file-text[data-name$=".pros"]:before,
 .theme-flatland-dark-ui .icon-book[data-name$=".pros"]:before {

@@ -6,29 +6,29 @@
     overflow-y: auto;
     overflow-x: auto;
 }
+.pros-conductor > .header {
+  display: flex;
+  padding-left: auto;
+  padding-right: auto;
+  align-items: center;
+  justify-content: center;
+  svg {
+      height: 6em;
+      width: 6em;
+      margin: 10px;
+  }
+  .title > h1 {
+      margin-bottom: 0.25em;
+  }
+  .title > h2 {
+      font-style: italic;
+      margin-top: 0.25em;
+  }
+}
 .pros-conductor {
     padding: 1em;
     max-width: 1000px;
     margin: auto;
-    .header {
-        display: flex;
-        padding-left: auto;
-        padding-right: auto;
-        align-items: center;
-        justify-content: center;
-    }
-    .header svg {
-        height: 6em;
-        width: 6em;
-        margin: 10px;
-    }
-    .header .title > h1 {
-        margin-bottom: 0.25em;
-    }
-    .header .title > h2 {
-        font-style: italic;
-        margin-top: 0.25em;
-    }
     .error-presenter {
         display: none;
     }
@@ -110,6 +110,9 @@
     .project.disabled {
         visibility: collapse;
     }
+    .project {
+      min-height: 14em;
+    }
     .project >:first-child {
         font-style: italic;
     }
@@ -171,7 +174,7 @@
         text-align: center;
         font-size: 2em;
     }
-    .global > div {
+    .global > div:not(.header) {
         display: flex;
         flex-flow: row wrap;
         align-content: space-between;
@@ -186,12 +189,21 @@
         padding: 5px;
     }
     .global > div .depots {
-        flex: 1 0 100%;
+        flex: 0 1 66%;
     }
     .global h3 {
         margin-top: 0;
     }
     .global {
+      .header {
+        display: flex;
+        h2, h3 {
+          flex-grow: 1;
+        }
+        .btn-group {
+          margin: auto 0;
+        }
+      }
         table {
             // padding: 1em;
             overflow-y: scroll;
@@ -235,22 +247,59 @@
             color: @text-color-info;
             cursor: pointer;
         }
-        .depots table {
-            width: auto;
-            margin: 0 auto;
-            td {
-                width: auto;
-                min-width: 120px;
+        .depots {
+          .header {
+            display: flex !important;
+            margin-bottom: 7px;
+            flex: 0 1 auto;
+            h3 {
+              display: inline-block;
             }
-            tr.selected-depot {
-                background-color: @background-color-selected;
-                color: @text-color-highlight;
-                font-weight: bold;
+            .btn-group {
+              margin-left: auto;
+              button.icon-file-add:hover{
+                color: @text-color-success;
+              }
             }
-        }
-        .depots label {
-          display: block;
-          padding: 2px 0;
+          }
+          .depot-input {
+            display: block;
+            margin: 3px;
+          }
+          h4 {
+            display: inline-block;
+          }
+          span {
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+            text-align: right;
+          }
+          span.icon-check {
+            color: @text-color-success;
+          }
+          span.icon-sync {
+            color: @text-color-warning;
+          }
+          span.icon-stop {
+            color: @text-color-error;
+          }
+          ul {
+            background-color: @app-background-color;
+            li {
+              padding: 3px 20px;
+            }
+            li:hover {
+              background-color: @background-color-highlight;
+            }
+            li.selected-depot {
+              background-color: @background-color-selected;
+              font-weight: bold;
+            }
+            .location {
+              float: right;
+            }
+          }
         }
     }
 }

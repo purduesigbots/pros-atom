@@ -1,6 +1,7 @@
 {$} = require 'atom-space-pen-views'
 cp = require 'child_process'
 semver = require 'semver'
+statusbar = require './views/statusbar'
 
 brand = require './views/brand'
 {setTimeout} = require 'timers'
@@ -16,6 +17,7 @@ createHtmlSafeString = (str) ->
 module.exports =
   prosConduct: (options...) -> ['pros', 'conduct', options...]
   execute: ({cmd, cb, includeStdErr=false, onstderr, onstdout}) ->
+    statusbar.working()
     outBuf = ''
     errBuf = ''
     # cmd = cmd.join ' '
@@ -33,8 +35,8 @@ module.exports =
       outBuf += data
       onstdout?(data)
     proc.on 'close', (c, s) ->
+      statusbar.stop()
       console.log errBuf if errBuf
-      # console.log {cmd, cb}
       cb c, outBuf, errBuf
     return proc
 

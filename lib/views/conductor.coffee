@@ -1,6 +1,5 @@
 {CompositeDisposable, Disposable} = require 'atom'
 {$, View, ScrollView, TextEditorView} = require 'atom-space-pen-views'
-cli = require '../cli'
 fs = require 'fs-plus'
 path = require 'path'
 commandExists = require 'command-exists'
@@ -9,7 +8,8 @@ utils = require '../utils'
 async = require 'async'
 std = require './standard'
 
-proscli = require '../proscli'
+cli = require '../proscli'
+{prosConduct} = cli
 
 module.exports =
   class ConductorView extends ScrollView
@@ -42,8 +42,8 @@ module.exports =
                     @span class: 'inline-block-tight icon icon-move-up'
                     @div outlet: 'projectKernel'
                   @div class: 'btn-group', =>
-                    @button class: 'inline-block-tight btn icon icon-move-up', => @raw 'Upgrade'
-
+                    @button class: 'inline-block-tight btn icon icon-move-up', outlet: 'upgradeProjectButton',
+                      => @raw 'Upgrade'
               @div class: 'libraries', =>
                 @div =>
                   @h3 'Libraries'
@@ -52,7 +52,10 @@ module.exports =
                 @ul class: 'list-group', outlet: 'projectLibraries'
           @hr()
           @div class: 'global', outlet: 'globalDiv', =>
-            @h2 'Global Configuration'
+            @div class: 'header', =>
+              @h2 'Global Configuration'
+              @div class: 'btn-group', =>
+                @button outlet: 'refreshGlobal', class: 'btn btn-sm icon icon-sync'
             @div =>
               @div class: 'kernel', outlet: 'globalKernelsDiv', =>
                 @h3 'Kernels'
@@ -74,15 +77,17 @@ module.exports =
                     @td()
                   @tbody outlet: 'globalLibraries'
               @div class: 'depots', outlet: 'globalDepotDiv', =>
-                @h3 'Depots'
-                @table class: 'list-group', =>
-                  @thead =>
-                    @td class: 'name', 'Name'
-                    @td class: 'location', 'Location'
-                    @td class: 'registrar', 'Registrar'
-                  @tbody outlet: 'globalDepots'
+                @div class: 'header', =>
+                  @h3 'Depots'
+                  @div class: 'btn-group btn-group-sm', =>
+                    @button class: 'btn icon icon-file-add',
+                    outlet: 'addDepotButton', => @raw 'Add'
+                    @button class: 'btn icon icon-trashcan', disabled: true,
+                    outlet: 'removeDepotButton', => @raw 'Remove'
+                @ul class: 'list-group', outlet: 'globalDepots'
                 @h4 outlet: 'selectedDepotHeader'
-                @div outlet: 'selectedDepotConfig'
+                @span outlet: 'selectedDepotStatus', class: 'inline-block depot-status icon icon-check'
+                @div class:'depot-config', outlet: 'selectedDepotConfig'
 
     libItem: (name, version, latest) ->
       "<li class='#{if latest then 'text-success' else 'text-warning'}'>
@@ -117,29 +122,17 @@ module.exports =
       </tr>"
 
     globalDepotItem: ({name, location, registrar}) ->
-      "<tr class='depot-item' data-name='#{name}' data-registrar='#{registrar}'>
-        <td class='name'>#{name}</td>
-        <td class='location'>#{location}</td>
-        <td class='registrar'>#{registrar}</td>
-      </tr>"
-    initialize: ({@uri, activeProject}={}) ->
+      li = $("<li class='depot-item list-item'>#{name}<span class='location'>#{location}</span></li>")
+      li.data {name, location, registrar}
+
+    initialize: ({@uri, activeProject, activeDepot}={}) ->
       super
       @subscriptions = new CompositeDisposable
-
-      # @subscriptions.add atom.tooltips.add @conductorErrorInfo[0], title: 'Copy Message'
-      # @conductorErrorInfo.on 'click', => atom.clipboard.write @conductorErrorInfo.text()
-
-      # @subscriptions.add atom.tooltips.add $('.pros-conductor.pros-message'), title: 'Copy Message'
-      # $('.pros-conductor.pros-message').on 'click', (e) ->
-      #   msg = $(e.target).closest '.pros-message'
-      #   atom.clipboard.write msg.text()
-      # @subscriptions.add atom.tooltips.add @projectErrorInfo[0], title: 'Copy Message'
-      # @projectErrorInfo.on 'click', => atom.clipboard.write @projectErrorInfo.text()
 
       std.applyLoading @globalDiv
       std.applyLoading @projectDiv
 
-      proscli.checkCli minVersion: '2.4.1', fmt: 'html', cb: (c, o) =>
+      cli.checkCli minVersion: '2.4.1', fmt: 'html', cb: (c, o) =>
         if c != 0
           @subscriptions.add td.addMessage @conductorDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
           # @conductorErrorInfo.addClass 'enabled'
@@ -147,7 +140,8 @@ module.exports =
           return
         std.clearMessages @conductorDiv
         # @conductorErrorInfo.removeClass 'enabled'
-        @on 'click', '.recent-projects > li', (e) => @updateSelectedPath $(e.target).closest('li').data 'path'
+        @on 'click', '.recent-projects > li', (e) =>
+          @updateSelectedPath $(e.target).closest('li').data('path'), true
 
         @initializeGlobalListing()
 
@@ -163,19 +157,27 @@ module.exports =
             oldPROSProjects = utils.findOpenPROSProjectsSync()
             atom.project.addPath p for p in paths
             newPROSProjects = utils.findOpenPROSProjectsSync().filter (p) -> p not in oldPROSProjects
-            console.log newPROSProjects
+            # console.log newPROSProjects
             @updateSelectedPath newPROSProjects?[0] or @selected?.data 'path'
-        @createNew.on 'click', -> new (require './new-project')
+        @createNew.on 'click', => new (require './new-project') cb: (complete, path) =>
+          # process.nextTick to let onDidChangePaths process
+          if complete then process.nextTick => @updateSelectedPath path
         @addLibraryButton.on 'click', =>
           _path = @selected?.data 'path'
           if _path then new (require './add-library') _path: _path, cb: (complete) =>
-            if complete then @updateSelectedPath null
+            if complete then @updateSelectedPath null, true
+        @upgradeProjectButton.on 'click', =>
+          _path = @selected?.data 'path'
+          if _path then new (require './upgrade-project') dir: _path, cb: (complete) =>
+            if complete then @updateSelectedPath null, true
 
         @updateAvailableProjects()
         activeProject ?= atom.project.getPaths()?[0]
         @updateSelectedPath activeProject
         std.removeLoading @globalDiv
-        @updateGlobalListing()
+        @updateGlobalKernels()
+        @updateGlobalLibraries()
+        @updateGlobalDepots activeDepot
 
     updateAvailableProjects: ->
       projects = utils.findOpenPROSProjectsSync()
@@ -189,7 +191,7 @@ module.exports =
 
     # does all the necessary view updates when the project path is changed. What normally would happen if
     # used data binding
-    updateSelectedPath: (project) ->
+    updateSelectedPath: (project, forceUpdate=false) ->
       if not project and not @selected
         $('.pros-conductor .project').addClass 'disabled'
         return
@@ -209,77 +211,96 @@ module.exports =
            ((idx + 1) * @selected.width()) > (@projectSelector.scrollLeft() + @projectSelector.width())
           @projectSelector.animate { scrollLeft: idx * @selected.width() }, 100
 
-      # if @selected?.data('path') == oldPath then return
+      if @selected?.data('path') == oldPath and not forceUpdate then return
       @activeProject = project = @selected.data 'path'
       @projectHeader.text "#{path.basename project} (#{project})"
       std.applyLoading @projectDiv
+      cli.execute {
+        cmd: prosConduct('info-project', project, '--machine-output'),
+        cb: (c, o, e) =>
+          if c == 0
+            info = (JSON.parse e) for e in o?.split(/\r?\n/).filter(Boolean)
+            std.clearMessages @projectDiv
+            # @projectErrorInfo.parent().removeClass 'enabled'
+            # set active project again in case user starts clicking between projects quickly
+            @activeProject = project = @selected.data 'path'
+            @projectHeader.text "#{path.basename project} (#{project})"
+            @projectKernel.text info.kernel
+            if info.kernelUpToDate
+              @projectKernel.parent().addClass 'text-success'
+              @projectKernel.parent().removeClass 'text-warning'
+            else
+              @projectKernel.parent().addClass 'text-warning'
+              @projectKernel.parent().removeClass 'text-success'
 
-      proscli.execute cmd: ['pros', 'conduct', 'info-project', project, '--machine-output'], cb: (c, o, e) =>
-        if c == 0
-          info = (JSON.parse e) for e in o?.split(/\r?\n/).filter(Boolean)
-          std.clearMessages @projectDiv
-          # @projectErrorInfo.parent().removeClass 'enabled'
-          # set active project again in case user starts clicking between projects quickly
-          @activeProject = project = @selected.data 'path'
-          @projectHeader.text "#{path.basename project} (#{project})"
-          @projectKernel.text info.kernel
-          if info.kernelUpToDate
-            @projectKernel.parent().addClass 'text-success'
-            @projectKernel.parent().removeClass 'text-warning'
+            @projectLibraries.empty()
+
+            if Object.keys(info.libraries).some((k) -> info.libraries.hasOwnProperty k)
+              for n, v of info.libraries
+                @projectLibraries.append @libItem n, v.version, v.latest
+            else
+              @projectLibraries.append "<ul class='background-message'>No libraries added</ul>"
+            std.removeLoading @projectDiv
           else
-            @projectKernel.parent().addClass 'text-warning'
-            @projectKernel.parent().removeClass 'text-success'
-
-          @projectLibraries.empty()
-
-          if Object.keys(info.libraries).some((k) -> info.libraries.hasOwnProperty k)
-            for n, v of info.libraries
-              @projectLibraries.append @libItem n, v.version, v.latest
-          else
-            @projectLibraries.append "<ul class='background-message'>No libraries added</ul>"
-          std.removeLoading @projectDiv
-        else
-          console.log {c, o, e}
-          # div = @projectErrorInfo.children('div')
-          # div.empty()
-          # for line in "STDOUT:\n#{o}\n\nERR:\n#{e}".split '\n'
-          #   div.append document.createTextNode line
-          #   div.append '<br/>'
-          # @projectErrorInfo.addClass 'enabled'
-          std.removeLoading @projectDiv
-          @subscriptions.add std.addMessage @projectDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
-
+            std.removeLoading @projectDiv
+            @subscriptions.add std.addMessage @projectDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
+      }
 
     initializeGlobalListing: ->
+      @selectedDepotStatus.hide()
       @on 'click', '.global .download-item .icon-cloud-download', (e) =>
         template = $(e.target).closest('tr').data()
-        console.log template
-        proscli.execute {
-          cmd: ['pros', 'conduct', 'download', template.name, template.version, template.depot],
+        cli.execute {
+          cmd: prosConduct('download', template.name, template.version, template.depot),
           cb: (c, o, e) =>
             if c == 0
-              atom.notifications.addSuccess "Downloaded kernel #{template.version}",
-                detail: o,
-                dismissable: true
+              atom.notifications.addSuccess "Downloaded kernel #{template.version}"
               @updateGlobalListing()
         }
       @on 'click', '.global .depot-item', (e) =>
+        @selectedDepotStatus.show()
+        @selectedDepotStatus.removeClass 'icon-sync icon-stop'
+        @selectedDepotStatus.addClass 'icon-check'
         @selectedDepot?.removeClass 'selected-depot'
-        @selectedDepot = $(e.target).closest 'tr'
+        @selectedDepot = $(e.target).closest 'li'
         @selectedDepot.addClass 'selected-depot'
         depot = @selectedDepot.data()
-        @selectedDepotHeader.text "#{depot.name} (#{depot.registrar})"
-        @createDepotConfig depot
+        @removeDepotButton.prop 'disabled', depot.name == 'pros-mainline'
+        @selectedDepotHeader.text "#{depot.name} uses #{depot.registrar} at #{depot.location}"
+        std.createDepotConfig @selectedDepotConfig, @updateDepotConfig, depot
+      @addDepotButton.click =>
+        new (require './add-depot') cb: ({complete, name}) =>
+          if complete
+            @updateGlobalKernels()
+            @updateGlobalLibraries()
+            @updateGlobalDepots name
+      @removeDepotButton.click =>
+        cli.execute {
+          cmd: prosConduct('rm-depot', '--name', @selectedDepot.data 'name'),
+          cb: (c, o, e) =>
+            if c != 0
+              atom.notifications.addError "Failed to remove #{@selectedDepot.data 'name'}",
+                detail: "OUT:\n#{o}\n\nERR:\n#{e}",
+                dismissable: true
+            else
+              atom.notifications.addSuccess "Successfully removed #{@selectedDepot.data 'name'}"
+              @updateGlobalDepots @selectedDepot?.data 'name'
+              @updateGlobalKernels()
+              @updateGlobalLibraries()
+        }
+      @refreshGlobal.click =>
+        @updateGlobalKernels()
+        @updateGlobalLibraries()
+        @updateGlobalDepots @selectedDepot?.data 'name'
 
 
-    updateGlobalListing: ->
-      std.applyLoading @globalLibraryDiv
+    updateGlobalKernels: ->
       std.applyLoading @globalKernelsDiv
-      std.applyLoading @globalDepotDiv
-      proscli.execute {
-        cmd: ['pros', 'conduct', 'lstemplate', '--kernels', '--machine-output'],
+      cli.execute {
+        cmd: prosConduct('lstemplate', '--kernels', '--machine-output'),
         cb: (c, o, e) =>
           std.removeLoading @globalKernelsDiv
+          std.clearMessages @globalKernelsDiv
           if c == 0
             listing = []
             for e in o?.split(/\r?\n/).filter(Boolean)
@@ -293,7 +314,7 @@ module.exports =
             if listing.length == 0
               @subscriptions.add std.addMessage @globalKernelsDiv,
                 "You don't have any depots which provide kernels.
-                Add a depot that provides depots to get started."
+                Add a depot that provides libraries to get started."
             else
               for {version, depot, offline, online} in listing
                 @globalKernels.append @globalKernelItem version, depot, offline, online
@@ -302,17 +323,22 @@ module.exports =
               "There was an error fetching the kernels listing:<br/>#{o}<br/>#{e}",
               error: true
       }
-      proscli.execute {
-        cmd: ['pros', 'conduct', 'lstemplate', '--libraries', '--machine-output'],
+
+    updateGlobalLibraries: ->
+      std.applyLoading @globalLibraryDiv
+      cli.execute {
+        cmd: prosConduct('lstemplate', '--libraries', '--machine-output'),
         cb: (c, o, e) =>
           std.removeLoading @globalLibraryDiv
+          std.clearMessages @globalLibraryDiv
           if c == 0
             listing = []
             for e in o?.split(/\r?\n/).filter(Boolean)
               try
                 listing = listing.concat JSON.parse e
               catch err
-                @subscriptions.add std.addMessage @globalLibraryDiv, "Error parsing: #{e} (#{err})", nohide: true
+                @subscriptions.add std.addMessage @globalLibraryDiv, "Error parsing: #{e} (#{err})",
+                nohide: true
             @globalLibraries.empty()
             if listing.length == 0
               @subscriptions.add std.addMessage @globalLibraryDiv,
@@ -327,8 +353,12 @@ module.exports =
               <br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
               error: true
       }
-      proscli.execute {
-        cmd: ['pros', 'conduct', 'ls-depot', '--machine-output'],
+
+    updateGlobalDepots: (prevSelected) ->
+      # console.log prevSelected
+      std.applyLoading @globalDepotDiv
+      cli.execute {
+        cmd: prosConduct('ls-depot', '--machine-output'),
         cb: (c, o, e) =>
           std.removeLoading @globalDepotDiv
           if c == 0
@@ -346,7 +376,13 @@ module.exports =
                 nohide: true
             else
               for depot in listing
-                @globalDepots.append @globalDepotItem depot
+                item = @globalDepotItem depot
+                @globalDepots.append item
+                if depot.name == prevSelected
+                  prevSelected = null
+                  item.click()
+              if prevSelected != null
+                @globalDepots.children().first().click()
           else
             @subscriptions.add std.addMessage @globalDepotDiv,
               "There was an error fetching the configured depots:
@@ -354,72 +390,35 @@ module.exports =
               error: true
       }
 
-    createDepotConfig: ({depot, registrar}) ->
-      if not @depotConfigCache then @depotConfigCache = {}
-      createBoolParameter = (key, prop, value) ->
-        label = $("<label></label>")
-        label.addClass 'input-label'
-        label.data 'key', key
-        input = $("<input data-key='#{key}' class='depot-input input-checkbox' type='checkbox'>
-        #{prop.prompt}
-        </input>")
-        input.attr 'checked', value ? prop.default ? false
-        label.append input
-        return label
-
-      createStrParameter = (key, prop, value) ->
-        div = $("<div data-key='#{key}' class='depot-input'>#{prop.prompt}</div>")
-        editor = new TextEditorView mini: true, placeholderText: prop.default
-        if value then editor.getModel().setText value
-        div.append editor
-
-
-      fillDepotConfig = (config) =>
-        proscli.execute {
-          cmd: ['pros', 'conduct', 'info-depot', depot, '--machine-output'],
-          cb: (c, o, e) =>
-            if c == 0
-              settings = {}
-              try
-                settings = JSON.parse o
-              catch err
-                std.addMessage @selectedDepotConfig,
-                  "There was an error parsing the configuration: #{o} (#{err})"
-                  error: true
-                return
-              @selectedDepotConfig.empty()
-              for k, v of config
-                if v.method == 'bool'
-                  @selectedDepotConfig.append createBoolParameter k, v, settings[k]
-                else
-                  @selectedDepotConfig.append createStrParameter k, v, settings[k]
-            else
-              std.addMessage @selectedDepotConfig,
-                "There was an error retrieving the depot configuration:
-                <br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}"
-        }
-        console.log config
-      if not @depotConfigCache.hasOwnProperty registrar
-        proscli.execute {
-          cmd: ['pros', 'conduct', 'ls-registrars', '--machine-output'],
-          cb: (c, o, e) =>
-            if c == 0
-              try
-                Object.assign(@depotConfigCache, JSON.parse o)
-                if @depotConfigCache.hasOwnProperty registrar
-                  fillDepotConfig @depotConfigCache[registrar]
-              catch err
-                console.error err
-            else console.log {c, o, e}
-        }
-      else
-        fillDepotConfig @depotConfigCache[registrar]
-
+    updateDepotCount: 0
+    updateDepotConfig: (depot, key, value) =>
+      @selectedDepotStatus.removeClass 'icon-check icon-stop'
+      @selectedDepotStatus.addClass 'icon-sync'
+      @updateDepotCount += 1
+      cli.execute {
+        cmd: prosConduct('set-depot-key', depot.toString(), key.toString(), value.toString()),
+        cb: (c, o, e) =>
+          std.clearMessages @selectedDepotConfig
+          if c != 0
+            std.addMessage @selectedDepotConfig,
+              "Error setting #{key} to #{value}<br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}",
+              nohide: true
+            @selectedDepotStatus.removeClass 'icon-check icon-sync'
+            @selectedDepotStatus.addClass 'icon-stop'
+            return
+          @updateDepotCount -= 1
+          if @updateDepotCount == 0
+            @selectedDepotStatus.removeClass 'icon-stop icon-sync'
+            @selectedDepotStatus.addClass 'icon-check'
+            @updateGlobalKernels()
+            @updateGlobalLibraries()
+      }
 
     serialize: ->
       deserializer: @constructor.name
       version: 1
       activeProject: @selected?.data 'path'
+      activeDepot: @selectedDepot?.data 'name'
       uri: @uri
 
     getURI: -> @uri
