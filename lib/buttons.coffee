@@ -1,5 +1,6 @@
 module.exports =
   addButtons: (toolBar) ->
+    toolBar.addSpacer()
     toolBar.addButton {
       icon: 'upload',
       callback: 'PROS:Upload-Project'

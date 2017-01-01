@@ -22,6 +22,7 @@ class ClangProvider
     'source.objcpp': 'objective-c++'
 
   getSuggestions: ({editor, scopeDescriptor, bufferPosition}) ->
+    if !atom.config.get 'pros.enable' then return
     language = LanguageUtil.getSourceScopeLang(@scopeSource, scopeDescriptor.getScopesArray())
     prefix = LanguageUtil.prefixAtPosition(editor, bufferPosition)
     [symbolPosition,lastSymbol] = LanguageUtil.nearestSymbolPosition(editor, bufferPosition)

@@ -1,4 +1,4 @@
-
+@import "ui-variables";
 .pros-status-bar {
   svg {
     height: @component-icon-size;
@@ -18,7 +18,7 @@
     fill: @text-color-subtle;
     transition: fill 0.5s;
     #overlay {
-      fill: white;
+      fill: @text-color-selected;
       opacity: 0;
     }
   }
@@ -26,8 +26,7 @@
     fill: #cca352;
   }
   .btn.animate svg #overlay {
-    animation: 1.25s ease-in 0s infinite alternate shine;
-    @keyframes shine {
+    @keyframes glow {
       from {
         opacity: 0;
       }
@@ -35,7 +34,18 @@
         opacity: 0.75;
       }
     }
+    animation: 1.25s linear 0s infinite alternate glow;
   }
-  .btn.animate:hover svg {
+  .btn.disable svg {
+    fill: @background-color-selected;
+  }
+  .btn.disable:hover svg {
+    fill: #cca352;
+  }
+  .btn.has-update svg {
+    fill: @background-color-info;
+  }
+  .btn.has-update svg {
+    fill: @text-color-info;
   }
 }

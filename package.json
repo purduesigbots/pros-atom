@@ -74,6 +74,10 @@
     }
   },
   "deserializers": {
-    "ConductorView": "deserializeConductorView"
+    "ConductorView": "deserializeConductorView",
+    "WelcomeView": "deserializeWelcomeView"
+  },
+  "cli_pros": {
+    "version": "2.4.1"
   }
 }

@@ -1,5 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {$, View} = require 'atom-space-pen-views'
+cli = require '../proscli'
 
 class StatusBar extends View
   @content: ->
@@ -23,30 +24,51 @@ class StatusBar extends View
       # coffeelint: enable=max_line_length
 
   tooltip: null
-  btn: null
   initialize: () ->
-    @button.onclick = ->
-      atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()),
-        'PROS:Toggle-PROS'
-    @btn = @button[0] # cache the lookup
-    @tooltip = atom.tooltips.add @button, title: 'Click to disable PROS editor components'
+    if !atom.config.get 'pros.enable'
+      @button.addClass 'disable'
+      @updateTooltip()
+
+    @button.on 'click', =>
+      if @button.hasClass 'has-update'
+        atom.workspace.open 'pros://welcome'
+      else
+        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()), 'PROS:Toggle-PROS'
+
+    atom.config.onDidChange 'pros.enable', ({newValue, oldValue}) =>
+      if newValue
+        @button.removeClass 'disable'
+        @updateTooltip()
+      else
+        @button.addClass 'disable'
+        @updateTooltip()
 
   attach: (provider) -> provider.addRightTile(item: this, priority: -10)
+
+  updateTooltip: ->
+    tip = ''
+    if @button.hasClass('animate')
+      tip = 'Running PROS CLI tasks in in the background.<br/>'
+    if @button.hasClass 'has-update'
+      tip += 'Click to update the PROS CLI.'
+    else if @button.hasClass 'disable'
+      tip += 'Click to enable PROS editor components.'
+    else
+      tip += 'Click to disable PROS editor components.'
+    @tooltip?.dispose()
+    @tooltip = atom.tooltips.add @button, title: tip
 
   count: 0
   working: () ->
     if @count == 0
       @button.addClass 'animate'
-      @tooltip?.dispose()
-      @tooltip = atom.tooltips.add @button,
-        title: 'Running PROS CLI tasks in the background.<br/>Click to disable PROS editor components'
+      @updateTooltip()
     @count += 1
 
   stop: (uid=0) ->
     @count -= 1
     if @count == 0
       @button.removeClass 'animate'
-      @tooltip?.dispose()
-      @tooltip = atom.tooltips.add @button, title: 'Click to disable PROS editor components'
+      @updateTooltip()
 
 module.exports = new StatusBar

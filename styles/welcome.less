@@ -5,86 +5,134 @@
     background-color: @base-background-color;
     display: flex;
     overflow: auto;
+    .header {
+      margin: auto;
+      padding-top: 5px;
+      display: block;
+      .title {
+        font-style: italic;
+        font-weight: normal;
+        text-decoration: none;
+        text-align: center;
+        font-size: 1.4em;
+      }
+      a:hover .title {
+        text-decoration: none;
+      }
+    }
+    .header > svg:first-child {
+      width: 12em;
+      height: 12em;
+      margin: 0 auto;
+      display: block;
+    }
+    .header > svg:nth-child(2) {
+      display:block;
+      margin: 1em auto 0 auto;
+      path {
+        fill: @text-color-selected;
+      }
+    }
+    .header > h1 {
+      font-size: 4.75em;
+      color: @text-color-selected;
+      text-align: center;
+      cursor: default;
+    }
+    section.cli-update {
+      margin: 0 auto 5px auto;
+      border-radius: @component-border-radius;
+      border: 2px solid transparent;
+      > div {
+        display: flex;
+        margin: auto;
+        padding: 5px;
+        > span.icon {
+          margin: auto 0 auto 2px;
+        }
+        > div {
+          margin: auto;
+          margin-left: 5px;
+          color: @text-color-highlight;
+          word-wrap: break-word;
+        }
+        .actions {
+          margin-top: auto;
+          margin-right: 0;
+          .btn-group {
+            margin: auto;
+            display: flex;
+          }
+        }
+      }
+    }
+    section.cli-update.info {
+      background-color: mix(@background-color-info, @base-background-color, 25%);
+      border-color: @background-color-info;
+      > div {
+        > span.icon {
+          color: @text-color-info;
+        }
+      }
+    }
+    section.cli-update.error {
+      background-color: mix(@background-color-error, @base-background-color, 25%);
+      border-color: @background-color-error;
+      > div {
+        > span.icon {
+          color: @text-color-error;
+        }
+      }
+    }
+    .panel {
+      background-color: @base-background-color;
+      p:first-child {
+        margin-bottom: 0;
+      }
+      a {
+        text-decoration: underline;
+      }
+    }
+    .welcome-settings {
+      display:flex;
+    }
+    form {
+      margin: auto;
+      label {
+        width: 100%;
+      }
+      input {
+        margin-right: 3px;
+      }
+    }
+    .versions {
+      display: flex;
+    }
+    .versions > div {
+      margin: auto;
+      display: inline;
+    }
+    .versions > div > div {
+      span {
+        vertical-align: middle;
+      }
+      margin: 5px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+    }
+    .footer > * {
+      padding: 1px;
+    }
 }
 
 div.pros-welcome > div {
   width: 100%;
-  padding: 0 2em 3em 2em;
+  padding: 5px 2em 10px 2em;
   margin: auto;
   max-width: 580px;
   min-width: 300px;
-}
-
-.pros-welcome .header {
-  margin: auto;
-  display: block;
-}
-.pros-welcome .header > svg:first-child {
-  width: 12em;
-  height: 12em;
-  margin: 0 auto;
-  display: block;
-}
-
-.pros-welcome .header > svg:nth-child(2) {
-  display:block;
-  margin: 1em auto 0 auto;
-  path {
-    fill: @text-color-selected;
-  }
-}
-.pros-welcome .header > h1 {
-  font-size: 4.75em;
-  color: @text-color-selected;
-  text-align: center;
-  cursor: default;
-}
-
-.pros-welcome .header .title {
-  font-style: italic;
-  font-weight: normal;
-  text-decoration: none;
-  text-align: center;
-  font-size: 1.4em;
-}
-
-.pros-welcome .header a:hover .title {
-  text-decoration: none;
-}
-
-.pros-welcome .panel {
-  background-color: @base-background-color;
-}
-
-.pros-welcome .welcome-settings {
-  display:flex;
-}
-.pros-welcome form {
-  margin: auto;
-}
-
-.pros-welcome form input {
-  margin-right: 3px;
-}
-
-.pros-welcome .versions {
-  display: flex;
-}
-
-.pros-welcome .versions > div {
-  margin: auto;
-  display: inline;
-}
-
-.pros-welcome .versions > div > div{
-  margin: 5px;
-  display: inline-block;
-  text-align: center;
-}
-
-.pros-welcome .footer {
-  text-align: center;
-}
-.pros-welcome .footer > * {
-  padding: 1px;
 }

@@ -2,12 +2,13 @@
 cp = require 'child_process'
 semver = require 'semver'
 statusbar = require './views/statusbar'
-
+{EOL} = require 'os'
 brand = require './views/brand'
 {setTimeout} = require 'timers'
 
 terminalService = null
 currentTerminal = null
+cliVer = null
 
 createHtmlSafeString = (str) ->
   temp = document.createElement 'div'
@@ -16,8 +17,8 @@ createHtmlSafeString = (str) ->
 
 module.exports =
   prosConduct: (options...) -> ['pros', 'conduct', options...]
-  execute: ({cmd, cb, includeStdErr=false, onstderr, onstdout}) ->
-    statusbar.working()
+  execute: ({cmd, cb, includeStdErr, onstderr, onstdout, nosb}) ->
+    if not nosb then statusbar.working()
     outBuf = ''
     errBuf = ''
     # cmd = cmd.join ' '
@@ -27,21 +28,25 @@ module.exports =
     proc = cp.spawn cmd[0], cmd[1..],
       env: env
       cwd: params?.cwd
+    proc.on 'error', (err) -> console.log err
     proc.stderr.on 'data', (data) ->
-      outBuf += data if includeStdErr
+      if includeStdErr
+        outBuf += data
       errBuf += data
       onstderr?(data)
     proc.stdout.on 'data', (data) ->
       outBuf += data
       onstdout?(data)
     proc.on 'close', (c, s) ->
-      statusbar.stop()
-      console.log errBuf if errBuf
+      if not nosb then statusbar.stop()
+      # console.log errBuf if errBuf
       cb c, outBuf, errBuf
     return proc
 
-  checkCli: ({minVersion, cb, fmt='text'}) ->
-    mapResponse = ({code, fmt, extra}) ->
+  checkCli: ({minVersion, cb, fmt='text', force=false, nosb=false, eol=EOL}) ->
+    mapResponse = (fmt, obj) ->
+      if fmt == "raw" then return obj
+      {code, extra} = obj
       switch code
         when 1
           switch fmt
@@ -60,43 +65,68 @@ module.exports =
         when 3
           switch fmt
             when 'html'
-              div = $('<div>PROS CLI is improperly configured.<br/></div>')
-              for line in extra.split '\n'
-                div.append document.createTextNode line
-                div.append '<br/>'
+              div = $("<div style='text-align: left; white-space: pre-line'></div>")
+              div.text "PROS CLI is improperly configured.#{eol}#{extra}"
               return div
             else "PROS CLI is improperly configured."
-        else ""
+        else obj.version ? obj.extra
+    respond = (obj)->
+      statusbar.tooltip?.dispose()
+      statusbar.button.removeClass 'has-update'
+      if obj.code == 1
+        statusbar.button.addClass 'has-update'
+      statusbar.updateTooltip()
+      cb obj.code, mapResponse fmt, obj
 
-    @execute cmd: ['where', 'pros'], cb: (c, o) =>
+    if cliVer != null and not force then respond cliVer
+    @execute cmd: ['where', 'pros'], nosb: nosb, cb: (c, o) =>
       if c != 0
-        console.log o
-        cb 2, mapResponse code: 2, fmt: fmt
+        # console.log o
+        cliVer = {code: 2}
+        respond cliVer
         return
-      @execute cmd: ['pros', '--version'], cb: (c, o, e) =>
+      @execute cmd: ['pros', '--version'], nosb: nosb, cb: (c, o, e) =>
         if c != 0
-          console.log {c, o, e}
-          cb 3, mapResponse code: 3, fmt: fmt, extra: "STDOUT:\n#{o}\n\nERR:\n#{e}"
+          # console.log {c, o, e}
+          cliVer = {code: 3, extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
+          respond cliVer
           return
         version = /pros, version (.*)/.exec(o)?[1]
         if version is undefined
           # try again one more time, just in case
-          @execute cmd: ['pros', '--version'], cb: (c, o) ->
+          @execute cmd: ['pros', '--version'], nosb: nosb, cb: (c, o) ->
             if c != 0
-              console.log o
-              cb 3, mapResponse code: 3, fmt: fmt, extra: "STDOUT:\n#{o}\n\nERR:\n#{e}"
+              # console.log o
+              cliVer = {code: 3, extra: extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
+              respond cliVer
               return
             version = /pros, version(.*)/.exec(o)?[1]
-            if not version or semver.lt version, minVersion
-              console.log o
-              cb 1, mapResponse code: 1, fmt: fmt, extra: "v#{version} does not meet v#{minVersion}"
+            if !version or semver.lt version, minVersion
+              # console.log o
+              cliVer = {code: 1, extra: "v#{version} does not meet v#{minVersion}", version: version}
+              respond cliVer
               return
-            cb 0, version
-        else if not version or semver.lt version, minVersion
-          console.log o
-          cb 1, mapResponse code: 1, fmt: fmt, extra: "v#{version} does not meet v#{minVersion}"
+            cliVer = {code: 0, extra: version}
+            respond cliVer
+        else if !version or semver.lt version, minVersion
+          # console.log o
+          cliVer = {code: 1, extra: "v#{version} does not meet v#{minVersion}", version: version}
+          respond cliVer
           return
-        cb 0, version
+        cliVer = {code: 0, version: version}
+        respond cliVer
+
+  invUpgrade: (callback) ->
+    @execute cmd: ['pros', 'upgrade', '--machine-output'], cb: (c, o, e) =>
+      if c != 0
+        atom.notifications.addError 'Unable to determine how PROS CLI is installed',
+            detail: 'You will need to upgrade PROS CLI for your intallation method.'
+      else
+        cmd = o.split '\n'
+        if not atom.inDevMode()
+          @execute cmd: cmd, cb: (c, o, e) -> console.log {c, o, e}
+        else
+          console.log "Running #{cmd.join ' '}"
 
   executeInTerminal: ({cmd}) ->
     wait = (ms) ->

@@ -4,7 +4,7 @@
 {Disposable} = require 'atom'
 fs = require 'fs'
 path = require 'path'
-cli = require './cli'
+cli = require './proscli'
 terminal = require './terminal-utilities'
 GA = require './ga'
 {provideBuilder} = require './make'
@@ -25,6 +25,9 @@ conductorUri = 'pros://conductor'
 conductorRegex = /conductor\/(.+)/i
 addLibraryUri = 'pros://addlib'
 addLibraryRegex = /addlib\/(.+)/i
+
+toolBar = null
+getToolBar = null
 
 module.exports =
   provideBuilder: provideBuilder
@@ -51,15 +54,13 @@ module.exports =
 
       if config.settings('').override_beautify_provider
         atom.config.set('atom-beautify.c.default_beautifier', 'clang-format')
-      lint.activate()
-      autocomplete.activate()
+
+      if atom.config.get 'pros.enable'
+        lint.activate()
+        autocomplete.activate()
 
       @registerProjectViewProvider = RegisterProjectView.register
       @registerProjectPanel = new RegisterProjectView
-
-      @subscriptions.add atom.deserializers.add
-        name: 'ProsWelcomeView'
-        deserialize: (state) -> createWelcomeView state
 
       atom.commands.add 'atom-workspace', 'PROS:New-Project': -> new (require './views/new-project')
       atom.commands.add 'atom-workspace', 'PROS:Upgrade-Project': ->
@@ -70,7 +71,8 @@ module.exports =
       atom.commands.add 'atom-workspace', 'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace', 'PROS:Toggle-Terminal': => @toggleTerminal()
       atom.commands.add 'atom-workspace', 'PROS:Show-Welcome': -> atom.workspace.open welcomeUri
-      atom.commands.add 'atom-workspace', 'PROS:Toggle-PROS': => @togglePROS()
+      atom.commands.add 'atom-workspace', 'PROS:Toggle-PROS': ->
+        atom.config.set 'pros.enable', !atom.config.get 'pros.enable'
       atom.commands.add 'atom-workspace', 'PROS:Open-Conductor': ->
         currentProject = atom.project.relativizePath atom.workspace.getActiveTextEditor()?.getPath()
         if currentProject[0]
@@ -82,9 +84,7 @@ module.exports =
           new (require './views/add-library') path: atom.project.getPaths()?[0]
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
-        if uri is welcomeUri
-          console.log WelcomeView ?= (require './react/conductor')
-          return WelcomeView
+        if uri is welcomeUri then WelcomeView ?= new (require './views/welcome')
 
       @subscriptions.add atom.workspace.addOpener (uri) ->
         if uri.startsWith conductorUri
@@ -97,9 +97,26 @@ module.exports =
       if atom.config.get 'pros.welcome.enabled'
         atom.workspace.open welcomeUri
 
-      cli.execute(((c, o) -> console.log o if o),
-        cli.baseCommand().concat ['conduct', 'first-run', '--no-force', '--use-defaults'])
+      atom.config.onDidChange 'pros.enable', ({newValue, oldValue}) =>
+        if newValue == oldValue then return
+        atom.commands.dispatch atom.views.getView(atom.workspace.getActivePane()), 'build:refresh-targets'
+        if newValue # PROS is now enabled
+          lint.activate()
+          autocomplete.activate()
+          if getToolBar then @consumeToolbar getToolBar
+        else # PROS is now disabled
+          lint.deactivate()
+          autocomplete.deactivate()
+          toolBar?.removeItems()
       @PROSstatus = true
+
+      cli.execute {
+        cmd: cli.prosConduct 'first-run', '--no-force', '--use-defaults'
+        cb: (c, o, e) -> console.log o if o
+      }
+
+      cli.checkCli minVersion: atom.packages.getLoadedPackage('pros').metadata.cli_pros.version, cb: (c, o) ->
+        if c != 0 then atom.workspace.open 'pros://welcome'
 
       grammarSubscription = atom.grammars.onDidAddGrammar (grammar) ->
         if grammar.scopeName is 'source.json'
@@ -118,20 +135,8 @@ module.exports =
        atom.config.get('core.telemetryConsent') is 'limited'
       GA.sendData sessionControl = 'end'
 
-  togglePROS: =>
-    if @PROSstatus or not @PROSstatus?
-      @toolBar.removeItems()
-      lint.deactivate()
-      autocomplete.deactivate()
-      # build.deactivate()
-      @PROSstatus = false
-    else
-      buttons.addButtons @toolBar
-      lint.activate()
-      autocomplete.activate()
-      @PROSstatus = true
-
   consumeLinter: lint.consumeLinter
+
   consumeRunInTerminal: (service) ->
     terminal.consumeRunInTerminal service
 
@@ -145,10 +150,12 @@ module.exports =
 
   toggleTerminal: -> cli.serialInTerminal()
 
-  consumeToolbar: (getToolBar) =>
-    @toolBar = getToolBar('pros')
-    buttons.addButtons @toolBar
-    @toolBar.onDidDestroy => @toolBar = null
+  consumeToolbar: (toolBarRegister) ->
+    getToolBar = toolBarRegister
+    toolBar = getToolBar('pros')
+    if atom.config.get 'pros.enable'
+      buttons.addButtons toolBar
+    toolBar.onDidDestroy -> toolBar = null
 
   autocompleteProvider: -> autocomplete.provide()
 
@@ -156,5 +163,6 @@ module.exports =
     Status.attach(statusbar)
 
   deserializeConductorView: (data) -> ConductorView ?= new (require('./views/conductor')) data
+  deserializeWelcomeView: (data) -> WelcomeView ?= new (require './views/welcome') data
 
   config: universalConfig.filterConfig config.config, 'atom'

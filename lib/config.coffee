@@ -15,45 +15,12 @@ module.exports =
         filename: 'atom-project.pros'
         recurseTimes: atom.config.get 'pros-atom.max_scan_iterations'
 
-  # settings: (file_path = atom.workspace.getActiveTextEditor().getPath()) ->
-  #   MAX_ITERS = atom.config.get 'pros-atom.max_scan_iterations'
-  #
-  #   directory_settings = path.join path.dirname(file_path), @FILENAME
-  #   config_file = ''
-  #
-  #   if fs.existsSync directory_settings
-  #     config_file = directory_settings
-  #   if config_file == '' && atom.project.getPaths()[0] != undefined
-  #     current_path = atom.project.getPaths()[0]
-  #     for [1...atom.config.get 'pros.max_scan_iterations']
-  #       if fs.existsSync path.join current_path, @FILENAME
-  #         config_file = path.join current_path, @FILENAME
-  #         break
-  #       current_path = path.join current_path, '..'
-  #   data = {}
-  #   if config_file != ''
-  #     delete require.cache[config_file]
-  #     data = require config_file
-  #
-  #   valOrDefault = (obj, property, default_key) ->
-  #     if !obj.hasOwnProperty property then atom.config.get default_key
-  #     else obj[property]
-  #
-  #   result = {
-  #     lintDefaultCFlags: data.lintDefaultCFlags or
-  #       atom.config.get 'pros.lint_default_C_flags'
-  #     lintDefaultCppFlags: data.lintDefaultCppFlags or
-  #       atom.config.get 'pros.lint_default_Cpp_flags'
-  #     lintErrorLimit: data.lintErrorLimit or
-  #       atom.config.get 'pros.lint_error_limit'
-  #     lintIncludePaths: data.lintIncludePaths or
-  #       atom.config.get 'pros.lint_include_paths'
-  #     lintSuppressWarnings: data.lintSuppressWarnings or
-  #       atom.config.get 'pros.lint_suppress_warnings'
-  #   }
-  #   return result
-
   config:
+    enable:
+      type: 'boolean'
+      default: true
+      scope: ['atom']
+      description: 'Disables PROS tool-bar buttons, linter, autocomplete, and build'
     override_beautify_provider:
       type: 'boolean'
       default: true
@@ -131,7 +98,3 @@ module.exports =
         on_the_fly:
           type: 'boolean'
           default: true
-        on_the_fly_interval:
-          type: 'integer'
-          default: 250
-          minimum: 1

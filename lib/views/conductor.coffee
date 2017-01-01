@@ -134,9 +134,7 @@ module.exports =
 
       cli.checkCli minVersion: '2.4.1', fmt: 'html', cb: (c, o) =>
         if c != 0
-          @subscriptions.add td.addMessage @conductorDiv, "STDOUT:\n#{o}\n\nERR:\n#{e}", error: true
-          # @conductorErrorInfo.addClass 'enabled'
-          # @conductorErrorInfo.children('div').html o
+          @subscriptions.add std.addMessage @conductorDiv, o, error: true
           return
         std.clearMessages @conductorDiv
         # @conductorErrorInfo.removeClass 'enabled'

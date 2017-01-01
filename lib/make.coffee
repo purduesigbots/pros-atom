@@ -23,10 +23,12 @@ module.exports =
       getNiceName: () -> return 'GNU Make for PROS'
 
       isEligible: () ->
-        @files = [ 'Makefile', 'GNUmakefile', 'makefile' ]
-          .map((f) => path.join @cwd, f)
-          .filter fs.existsSync
-        return @files.length > 0
+        if atom.config.get 'pros.enable'
+          @files = [ 'Makefile', 'GNUmakefile', 'makefile' ]
+            .map((f) => path.join @cwd, f)
+            .filter fs.existsSync
+          return @files.length > 0
+        else return false
 
       settings: () ->
         args = [ '-j' + config.settings('.').parallel_make_jobs or 1]
