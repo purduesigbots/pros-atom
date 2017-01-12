@@ -79,7 +79,9 @@ module.exports =
       cb obj.code, mapResponse fmt, obj
 
     if cliVer != null and not force then respond cliVer
-    @execute cmd: ['where', 'pros'], nosb: nosb, cb: (c, o) =>
+    which = ['which', 'pros']
+    if navigator.platform is 'Win32' then which[0] = 'where'
+    @execute cmd: which, nosb: nosb, cb: (c, o) =>
       if c != 0
         # console.log o
         cliVer = {code: 2}
