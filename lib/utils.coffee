@@ -57,6 +57,9 @@ module.exports =
         if path.basename(file) == 'project.pros'
           results.push path.dirname file
       ),
-      ((d) -> traversal d)
+      ((d) ->
+        if !path.basename(d).startsWith '.'
+          try traversal d
+          catch e then)
     traversal project for project in atom.project.getPaths()
     return results
