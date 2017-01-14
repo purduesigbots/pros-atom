@@ -9,7 +9,7 @@ utils = require '../utils'
 module.exports =
   class UpgradeProjectModal extends View
     @content: ->
-      @div class: 'pros-upgrade-project', =>
+      @div class: 'pros-modal pros-upgrade-project', =>
         @h1 'Upgrade a PROS Project'
         @div class: 'directory-selector', =>
           @h4 'Choose a directory:'

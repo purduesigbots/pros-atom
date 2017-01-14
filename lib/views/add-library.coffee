@@ -11,7 +11,7 @@ std = require './standard'
 module.exports =
   class AddLibraryModal extends View
     @content: ->
-      @div class: 'pros-add-library', tabindex: -1, =>
+      @div class: 'pros-modal pros-add-library', tabindex: -1, =>
         @h1 'Add Library to PROS Project'
         @h4 'Choose a project:'
         @div class: 'select-list', id: 'projectPathPicker', outlet: 'projectPathPicker', =>
