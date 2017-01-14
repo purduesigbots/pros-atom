@@ -51,7 +51,7 @@
     },
     "status-bar": {
       "versions": {
-        "1.0.0": "consumeStatusBar"
+        "^1.0.0": "consumeStatusBar"
       }
     },
     "runInTerminal": {
