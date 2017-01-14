@@ -3,18 +3,25 @@
 fs = require 'fs'
 path = require 'path'
 {prosConduct} = cli = require '../proscli'
+std = require './standard'
+utils = require '../utils'
 
 module.exports =
-  class NewProjectModal extends View
+  class UpgradeProjectModal extends View
     @content: ->
-      @div class: 'pros-modal pros-new-project', =>
-        @h1 'Create a new PROS Project'
+      @div class: 'pros-modal pros-upgrade-project', =>
+        @h1 'Upgrade a PROS Project'
         @div class: 'directory-selector', =>
           @h4 'Choose a directory:'
-          @div style: 'display: flex; flex-direction: row-reverse;', =>
-            @button class: 'btn btn-default', outlet: 'openDir', =>
-              @span class: 'icon icon-ellipsis'
-            @subview 'projectPathEditor', new TextEditorView mini: true
+          @div class: 'select-list', id: 'projectPathPicker', outlet: 'projectPathPicker', =>
+            @div style: 'display: flex; flex-direction: row-reverse;', =>
+              @button class: 'btn btn-default', outlet: 'openDir', =>
+                @span class: 'icon icon-ellipsis'
+              @button class: 'btn btn-default', outlet: 'toggleListButton', =>
+                @span class: 'icon icon-three-bars'
+              @subview 'projectPathEditor', new TextEditorView mini: true
+            @ol class: 'list-group', =>
+              (@li p) for p in atom.project.getPaths()
         @div class: 'kernel-selector', outlet: 'kernelSelector', =>
           @h4 'Choose a kernel:'
           @select class: 'input-select', outlet: 'kernelsList', =>
@@ -22,7 +29,7 @@ module.exports =
         @div class: 'actions', =>
           @div class: 'btn-group', =>
             @button outlet: 'cancelButton', class: 'btn', 'Cancel'
-            @button outlet: 'createButton', class: 'btn btn-primary icon icon-rocket', 'Create'
+            @button outlet: 'registerButton', class: 'btn btn-primary icon icon-rocket', 'Register'
           @span class: 'loading loading-spinner-tiny'
 
     initialize: ({dir, @cb}={}) ->
@@ -33,32 +40,32 @@ module.exports =
       atom.commands.add @element, 'core:cancel', => @cancel()
       @panel ?= atom.workspace.addModalPanel item: this, visible: false
 
-      @createButton.prop 'disabled', true
+      @registerButton.prop 'disabled', true
       @projectPathEditor.getModel().onDidChange =>
-        @createButton.prop 'disabled', !!!@projectPathEditor.getText()
+        @registerButton.prop 'disabled', !!!@projectPathEditor.getText()
+
+      @toggleListButton.click -> $('#projectPathPicker ol').toggleClass 'enabled'
 
       @openDir.click => atom.pickFolder (paths) =>
         if paths?[0]
           @projectPathEditor.setText paths[0]
 
-      @createButton.click =>
+      @registerButton.click =>
         if dir = @projectPathEditor.getText()
           template = JSON.parse @kernelsList.val()
           $(@element).find('.actions').addClass 'working'
           cli.execute {
-            cmd: prosConduct 'new', dir, template.version, template.depot
+            cmd: prosConduct 'register', dir, template.version
             cb: (c, o, e) =>
               @cancel true # destroy the modal
               if c is 0
-                atom.notifications.addSuccess 'Created a new project', detail: o
+                atom.notifications.addSuccess "Registered a project", detail: o
                 atom.project.addPath dir
-                firstPath = path.join dir, 'src', 'opcontrol.c'
-                fs.exists firstPath, (exists) -> if exists then atom.workspace.open firstPath, pending: true
               else
-                atom.notifications.addError 'Failed to create project',
+                atom.notifications.addError 'Failed to upgrade project',
                   detail: "OUT:\n#{o}\n\nERR:#{e}"
                   dismissable: true
-            }
+          }
 
       @cancelButton.click => @cancel()
 
@@ -81,13 +88,13 @@ module.exports =
           try
             listing = JSON.parse o
           catch error
-            @subscriptions.add std.addMessage @kernelSelector,
-              "Error parsing the list of downloaded kernels (#{o}).<br/>#{error}", error: true, nohide: true
+            @subscriptions.add std.addMessage @kernelsList,
+              "Error parsing the list of downloaded kernels (#{o}).<br/>#{error}", error: true
             return
           if listing.length == 0
-            @subscriptions.add std.addMessage @kernelSelector,
+            @subscriptions.add std.addMessage @kernelsList,
               "You don't have any downloaded kernels.<br/>
-              Visit <a>Conductor</a> to download some.", nohide: true
+              Visit <a>Conductor</a> to download some."
             @kernelsList.find('a').on 'click', =>
               @cancel()
               atom.workspace.open 'pros://conductor'

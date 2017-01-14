@@ -1,5 +1,4 @@
 {CompositeDisposable} = require 'atom'
-{RegisterProjectView} = require './views/register-project/register-project-view'
 # {`TerminalView`} = require './views/terminal/terminal-view'
 {Disposable} = require 'atom'
 fs = require 'fs'
@@ -59,15 +58,12 @@ module.exports =
         lint.activate()
         autocomplete.activate()
 
-      @registerProjectViewProvider = RegisterProjectView.register
-      @registerProjectPanel = new RegisterProjectView
-
       atom.commands.add 'atom-workspace', 'PROS:New-Project': -> new (require './views/new-project')
       atom.commands.add 'atom-workspace', 'PROS:Upgrade-Project': ->
         currentProject = atom.project.relativizePath atom.workspace.getActiveTextEditor()?.getPath()
         if currentProject[0] then new ( require './views/upgrade-project') dir: currentProject[0]
         else new (require './views/upgrade-project')
-      atom.commands.add 'atom-workspace', 'PROS:Register-Project': => @registerProject()
+      atom.commands.add 'atom-workspace', 'PROS:Register-Project': -> new (require './views/register-project')
       atom.commands.add 'atom-workspace', 'PROS:Upload-Project': => @uploadProject()
       atom.commands.add 'atom-workspace', 'PROS:Toggle-Terminal': => @toggleTerminal()
       atom.commands.add 'atom-workspace', 'PROS:Show-Welcome': -> atom.workspace.open welcomeUri
@@ -145,8 +141,6 @@ module.exports =
       cli.uploadInTerminal '-f "' + \
         (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
           atom.project.getPaths()[0]) + '"'
-
-  registerProject: -> @registerProjectPanel.toggle()
 
   toggleTerminal: -> cli.serialInTerminal()
 
