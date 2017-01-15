@@ -7,7 +7,7 @@ std = require './standard'
 module.exports =
   class AddDepotModal extends ScrollView
     @content: ->
-      @div class: 'pros-add-depot', tabindex: -1, =>
+      @div class: 'pros-modal pros-add-depot', tabindex: -1, =>
         @h1 'Add a new PROS Depot'
         @h4 'Choose a registrar:'
         @div class: 'registrar-picker select-list', =>
