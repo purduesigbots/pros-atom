@@ -7,6 +7,8 @@ hideChildren = (element) ->
 showChildren = (element) ->
   element.children().not(element.children ':header').not(element.children '.header').css 'display', ''
 
+fillDepotConfig = null
+
 module.exports =
   errorPresenter: (settings) ->
     @div Object.assign(settings, class: 'error-presenter'), =>
@@ -42,11 +44,30 @@ module.exports =
     element.children('.pros-message').remove()
     showChildren element
 
-
-  createDepotConfig: (location, updateConfig, {name: depot, registrar}) ->
-    if not location then location = $('<div></div')
+  getDepotConfig: (registrar) ->
     if not @depotConfigCache then @depotConfigCache = {}
-    @applyLoading location
+    if not @depotConfigCache.hasOwnProperty registrar then @updateCache registrar
+    return @depotConfigCache[registrar]
+
+  updateCache: (registrar) ->
+    cli.execute {
+      cmd: ['pros', 'conduct', 'ls-registrars', '--machine-output'],
+      cb: (c, o, e) =>
+        if c == 0
+          try
+            Object.assign(@depotConfigCache, JSON.parse o)
+            if @depotConfigCache.hasOwnProperty registrar
+              @fillDepotConfig @depotConfigCache[registrar].config
+            console.log @depotConfigCache
+          catch err
+            console.error err
+        else console.log {c, o, e}
+    }
+
+  createDepotConfig: (target, updateConfig, {name: depot, registrar}) ->
+    if not target then target = $('<div></div')
+    if not @depotConfigCache then @depotConfigCache = {}
+    @applyLoading target
     createBoolParameter = (key, prop, value) ->
       label = $("<label class='depot-input'></label>")
       label.addClass 'input-label'
@@ -64,44 +85,33 @@ module.exports =
       if value then editor.getModel().setText value
       editor.getModel().onDidChange -> updateConfig depot, key, editor.getModel().getText()
       div.append editor
-    fillDepotConfig = (config) =>
+    @fillDepotConfig = (config) =>
       cli.execute {
         cmd: ['pros', 'conduct', 'info-depot', depot, '--machine-output'],
         cb: (c, o, e) =>
-          @removeLoading location
+          @removeLoading target
           if c == 0
             settings = {}
             try
               settings = JSON.parse o
             catch err
-              @addMessage location,
+              @addMessage target,
                 "There was an error parsing the configuration: #{o} (#{err})"
                 error: true
               return
-            location.empty()
+            target.empty()
             keys = (k for own k, v of config).sort()
             for {k, v} in ({k, v: config[k]} for k in keys)
               if v.method == 'bool'
-                location.append createBoolParameter k, v, settings[k]
+                target.append createBoolParameter k, v, settings[k]
               else
-                location.append createStrParameter k, v, settings[k]
+                target.append createStrParameter k, v, settings[k]
           else
             @addMessage @selectedDepotConfig,
               "There was an error retrieving the depot configuration:
               <br/>STDOUT:<br/>#{o}<br/><br/>ERR:<br/>#{e}"
       }
     if not @depotConfigCache.hasOwnProperty registrar
-      cli.execute {
-        cmd: ['pros', 'conduct', 'ls-registrars', '--machine-output'],
-        cb: (c, o, e) =>
-          if c == 0
-            try
-              Object.assign(@depotConfigCache, JSON.parse o)
-              if @depotConfigCache.hasOwnProperty registrar
-                fillDepotConfig @depotConfigCache[registrar]
-            catch err
-              console.error err
-          else console.log {c, o, e}
-      }
+      @updateCache registrar
     else
-      fillDepotConfig @depotConfigCache[registrar]
+      @fillDepotConfig @depotConfigCache[registrar].config
