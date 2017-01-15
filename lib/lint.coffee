@@ -51,7 +51,7 @@ module.exports =
         args = []
         grammar_type = @getValidGrammar editor
         flags = if grammar_type = 'C++' then settings.lint.default_Cpp_flags \
-          else if grammar_type = 'C' then settings.lint.default_Cpp_flags
+          else if grammar_type = 'C' then settings.lint.default_C_flags
         args = args.concat flags.split ' '
         if settings.lint.error_limit >= 0
           args.push "-fmax-errors=#{settings.lint.error_limit}"
@@ -59,21 +59,23 @@ module.exports =
           args.push "-I#{path.join cwd, include}"
         if settings.lint.suppress_warnings then args.push '-w'
         args.push lintable_file
-        temp = (require 'tempfile') path.extname editor.getPath()
-        args.push "-o #{temp}"
+        if path.extname(editor.getPath()).toLowerCase() in ['.h' ,'.hpp']
+          args.push '-fsyntax-only'
+        else
+          temp = (require 'tempfile') path.extname editor.getPath()
+          args.push "-o #{temp}"
         args = args.filter Boolean
         execute {
           cmd: [command, args...],
           includeStdErr: true,
           cb: (c, o, e) ->
-            if o
-              regex = "(?<file>.+):(?<line>\\d+):(?<col>\\d+):\\s*\\w*\\s*" +
-                "(?<type>(error|warning|note)):\\s*(?<message>.*)"
-              msgs = linthelp.parse o, regex
-              msgs.filter((entry) -> entry.filePath == lintable_file) \
-                .forEach (entry) -> entry.filePath = real_file
-              module.exports.messages[real_file] = msgs
-              module.exports.linter?.setMessages?(msgs)
+            regex = "(?<file>.+):(?<line>\\d+):(?<col>\\d+):\\s*\\w*\\s*" +
+              "(?<type>(error|warning|note)):\\s*(?<message>.*)"
+            msgs = linthelp.parse o, regex
+            msgs.filter((entry) -> entry.filePath == lintable_file) \
+              .forEach (entry) -> entry.filePath = real_file
+            module.exports.messages[real_file] = msgs
+            module.exports.linter?.setMessages?(msgs)
         }
       else
         atom.notifications.addError 'pros: Error trying to find command',
