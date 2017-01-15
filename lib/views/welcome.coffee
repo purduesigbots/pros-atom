@@ -53,7 +53,7 @@ module.exports =
                     @span class: 'loading loading-spinner-tiny inline-block'
           @footer class:"footer", =>
             @a outlet: 'home', => @raw 'pros.cs.purdue.edu'
-            @span class: 'text-subtle', => @raw 'ｘ'
+            @span class: 'text-subtle', => @raw '×'
             @a outlet: 'github', class: 'icon icon-octoface'
 
     initialize: ->

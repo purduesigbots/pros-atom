@@ -45,6 +45,7 @@ module.exports =
         @upgradeButton.prop 'disabled', !!!@projectPathEditor.getText()
 
       @toggleListButton.click -> $('#projectPathPicker ol').toggleClass 'enabled'
+      @projectPathPicker.find('li').on 'click', (e) => @projectPathEditor.setText $(e.target).text()
 
       @openDir.click => atom.pickFolder (paths) =>
         if paths?[0]

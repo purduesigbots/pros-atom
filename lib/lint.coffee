@@ -81,12 +81,12 @@ module.exports =
             detail: "Couldn't find #{command} in environment"
           }
 
-  lintOnSave: () =>
+  lintOnSave: () ->
     editor = atom.workspace.getActiveTextEditor()
-    if not editor? or editor.getGrammar().name not in grammars then return
+    if not editor or editor.getGrammar().name not in grammars then return
     module.exports.lint editor, editor.getPath(), editor.getPath()
 
-  lintOnTheFly: () =>
+  lintOnTheFly: () ->
     editor = atom.workspace.getActiveTextEditor()
     if not editor? or editor.getGrammar().name not in grammars then return
     if not config.settings().lint.on_the_fly then return

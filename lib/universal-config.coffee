@@ -36,6 +36,8 @@ handlers =
     return unless atom.workspace.getActiveTextEditor()
     dir = atom.workspace.getActiveTextEditor().getPath()
     for [1...(options?.directory?.recurseTimes or 5)]
+      if !!dir
+        break
       dir = path.dirname dir
       try
         pat = path.join dir, filename
