@@ -95,11 +95,12 @@ module.exports =
       bufferedProcess.process.stdin.end()
 
   buildGoDeclarationCommandArgs: (editor,language,term)->
-    settings = config.settings()
+    settings = config.settings editor.getPath()
     std = if language == 'c' then 'c99' else language
     currentDir = path.dirname(editor.getPath())
     pchFile = [pchFilePrefix, language, "pch"].join '.'
     pchPath = path.join(currentDir, pchFile)
+    projectRoot = utils.findRoot atom.workspace.getActiveTextEditor().getPath()
 
     args = ["-fsyntax-only"]
     args.push "-x#{language}"
@@ -108,7 +109,7 @@ module.exports =
     args.push "-Xclang", "-ast-dump-filter"
     args.push "-Xclang", "#{term}"
     args.push("-include-pch", pchPath) if existsSync(pchPath)
-    args.push "-I#{i}" for i in settings.include_paths
+    args.push "-I#{path.join projectRoot, i}" for i in settings.include_paths
     args.push "-I#{currentDir}"
 
     try

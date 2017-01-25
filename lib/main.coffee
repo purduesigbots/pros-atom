@@ -4,7 +4,6 @@
 fs = require 'fs'
 path = require 'path'
 cli = require './proscli'
-terminal = require './terminal-utilities'
 GA = require './ga'
 {provideBuilder} = require './make'
 lint = require './lint'
@@ -134,13 +133,15 @@ module.exports =
   consumeLinter: lint.consumeLinter
 
   consumeRunInTerminal: (service) ->
-    terminal.consumeRunInTerminal service
+    cli.consumeTerminalService service
 
   uploadProject: ->
     if atom.project.getPaths().length > 0
-      cli.uploadInTerminal '-f "' + \
+      cli.executeInTerminal cmd: [
+        'pros', 'flash', '-f', '"' +
         (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
           atom.project.getPaths()[0]) + '"'
+      ]
 
   toggleTerminal: -> cli.serialInTerminal()
 

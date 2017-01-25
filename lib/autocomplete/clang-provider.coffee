@@ -103,14 +103,17 @@ class ClangProvider
     settings = config.settings()
     std = if language == 'c' then 'c99' else language
     currentDir = path.dirname(editor.getPath())
+    projectRoot = utils.findRoot atom.workspace.getActiveTextEditor().getPath()
 
     args = ["-fsyntax-only"]
     args.push "-x#{language}"
     args.push "-std=#{std}" if std
     args.push "-Xclang", "-code-completion-macros"
     args.push "-Xclang", "-code-completion-at=-:#{row + 1}:#{column + 1}"
-    args.push "-I#{i}" for i in settings.include_paths
+    args.push "-I#{path.join projectRoot, i}" for i in settings.include_paths
     args.push "-I#{currentDir}"
+    if process.env['PROS_TOOLCHAIN']
+      args.push "-I#{path.join process.env['PROS_TOOLCHAIN'], 'arm-none-eabi', 'include'}"
 
     if settings.autocomplete.includeDocumentation
       args.push "-Xclang", "-code-completion-brief-comments"

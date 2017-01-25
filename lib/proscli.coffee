@@ -1,4 +1,5 @@
 {$} = require 'atom-space-pen-views'
+{Disposable} = require 'atom'
 cp = require 'child_process'
 semver = require 'semver'
 statusbar = require './views/statusbar'
@@ -133,24 +134,25 @@ module.exports =
   executeInTerminal: ({cmd}) ->
     wait = (ms) ->
       start = new Date().getTime()
-      continue while new Date().getTime() - start < ms
-
-    if Boolean terminalService
-      if not Boolean currentTerminal
-        currentTerminal = terminalService.run([])[0].spacePenView
-        currentTerminal.statusIcon.style.color = "##{brand.brightGold}"
+      for num in [0...1e7]
+        if ((new Date().getTime() - start) > ms)
+          break
+    if Boolean(terminalService)
+      if Boolean currentTerminal
+        currentTerminal.insertSelection '\x03'
+        wait 75 # hard code waits to allow commands to be executed
+        currentTerminal.insertSelection(if navigator.platform is 'Win32' then 'cls' else 'clear')
+        wait 75
+        currentTerminal.insertSelection command.join ' '
+        currentTerminal.focus()
+      else
+        currentTerminal = terminalService.run([cmd.join ' '])[0].spacePenView
+        currentTerminal.statusIcon.style.color = '#cca352'
         currentTerminal.statusIcon.updateName 'PROS CLI'
         currentTerminal.panel.onDidDestroy () -> currentTerminal = null
-
-      currentTerminal.insertSelection '\x03'
-      wait 75
-      currentTerminal.insertSelection(if navigator.platform is 'Win32' then 'cls' else 'clear')
-      wait 75
-      currentTerminal.insertSelection command.join ' '
-      currentTerminal.focus()
-      currentTerminal
+      return currentTerminal
     else
-      null
+      return null
 
   consumeTerminalService: (service) ->
     if Boolean terminalService
