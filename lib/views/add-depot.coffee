@@ -16,6 +16,7 @@ module.exports =
         @h4 'Name the depot:'
         @subview 'nameEditor', new TextEditorView mini: true
         @h4 'Depot location:'
+        @div class: 'depot-location-desc', outlet: 'depotLocationDesc', 'placeholderText'
         @subview 'locationEditor', new TextEditorView mini: true
         @h4 'Options'
         @div class: 'depotOptions', outlet: 'depotOptions'
@@ -73,6 +74,8 @@ module.exports =
         @selectedRegistrar.addClass 'select'
         @depotConfig = {}
         std.createDepotConfig @depotOptions, @updateDepotConfig, {registrar: @selectedRegistrar.text()}
+        @depotLocationDesc.text((std.getDepotConfig @selectedRegistrar.text()).location_desc)
+
 
       @addButton.click =>
         console.log @depotConfig
