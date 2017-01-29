@@ -1,0 +1,118 @@
+.pros-modal {
+  padding: 10px;
+}
+
+#projectPathPicker > ol {
+  display: none;
+  margin-top: 0;
+}
+
+.directory-selector atom-text-editor,
+#projectPathPicker atom-text-editor {
+  flex-grow: 1;
+  margin-bottom: 0 !important;
+}
+
+.directory-selector button,
+#projectPathPicker button {
+  margin-left: 10px;
+}
+.directory-selector button span:before,
+#projectPathPicker button span:before {
+  margin-right: 0;
+}
+
+#projectPathPicker > ol.enabled {
+  display: block;
+}
+
+#projectPathPicker > ol > li:hover {
+  background-color: @background-color-highlight;
+}
+
+.depot-location-desc {
+  color: @text-color-subtle;
+  font-style: italic;
+  padding-left: 15px;
+}
+
+.directory-selector, .kernel-selector {
+  margin-bottom: 10px;
+}
+
+.kernel-selector {
+  display: flex;
+  vertical-align: middle;
+}
+.kernel-selector h4 {
+  padding: 8.5px 0;
+  margin: 0;
+}
+.kernel-selector select {
+  margin-left: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 3em;
+  min-width: 250px;
+  padding-left: 10px;
+}
+
+.actions {
+  display: flex;
+  flex-flow: row-reverse;
+}
+
+.actions .loading {
+  display: none;
+}
+.actions.working .loading {
+  display: block;
+  margin: auto 0;
+  margin-right: 10px;
+}
+.actions button {
+  height: 3em;
+}
+
+.actions button.icon-repo-create {
+  width: 76px;
+}
+
+.library-picker {
+  margin-bottom: 10px;
+}
+.library-picker li:hover {
+  background-color: @background-color-highlight;
+}
+
+.pros-add-library {
+  .library-picker {
+    div {
+      margin: 15px 0;
+    }
+    div:not(.error-presenter) {
+      color: mix(@text-color-error, @text-color-subtle, 75%);
+    }
+  }
+}
+
+.pros-add-depot {
+  padding: 20px 10px;
+  .registrar-picker {
+      ol {
+        max-height: 100px;
+        overflow-y: auto;
+      }
+    li.select {
+      background-color: @background-color-selected;
+      font-weight: bold;
+    }
+    li:hover {
+      background-color: @background-color-highlight;
+    }
+  }
+  .depotOptions > * {
+    display: block;
+    margin: 3px;
+  }
+}

@@ -1,17 +1,51 @@
-.pros-status-bar svg {
-  height: @component-icon-size;
-  width: @component-icon-size;
-  text-align: center;
-  fill: @text-color-subtle;
-}
-.pros-status-bar .btn.btn-default,  .pros-status-bar .btn.btn-default:hover,  .pros-status-bar .btn.btn-default:focus {
-  background: none;
-  border: none;
-  height: @component-line-height;
-  margin-top: 4px;
-  padding: 0;
-}
-
-.pros-status-bar .btn.btn-default:hover svg  {
-  fill: #cca352;
+@import "ui-variables";
+.pros-status-bar {
+  svg {
+    height: @component-icon-size;
+    width: @component-icon-size;
+    text-align: center;
+  }
+  .btn.btn-default,
+  .btn.btn-default:hover,
+  .btn.btn-default:focus {
+    background: none;
+    border: none;
+    height: @component-line-height;
+    margin-top: 4px;
+    padding: 0;
+  }
+  .btn svg {
+    fill: @text-color-subtle;
+    transition: fill 0.5s;
+    #overlay {
+      fill: @text-color-selected;
+      opacity: 0;
+    }
+  }
+  .btn:hover svg {
+    fill: #cca352;
+  }
+  .btn.animate svg #overlay {
+    @keyframes glow {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 0.75;
+      }
+    }
+    animation: 1.25s linear 0s infinite alternate glow;
+  }
+  .btn.disable svg {
+    fill: @background-color-selected;
+  }
+  .btn.disable:hover svg {
+    fill: #cca352;
+  }
+  .btn.has-update svg {
+    fill: @background-color-info;
+  }
+  .btn.has-update svg {
+    fill: @text-color-info;
+  }
 }

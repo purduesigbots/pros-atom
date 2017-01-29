@@ -1,6 +1,7 @@
 fs = require 'fs-plus'
 path = require 'path'
 cp = require 'child_process'
+async = require 'async'
 @cliVersion = ''
 @pkgVersion = ''
 
@@ -9,7 +10,6 @@ module.exports =
     return @cliVersion
 
   pkgVersion: =>
-    console.log "func: #{@pkgVersion}"
     return @pkgVersion
 
   findRoot: (_path, n = 10) ->
@@ -48,3 +48,18 @@ module.exports =
         @cliVersion = stdout.replace 'pros, version ', ''
 
     # cb0 @cliVersion
+
+  findOpenPROSProjectsSync: ->
+    results = []
+    traversal = (dir) ->
+      fs.traverseTreeSync dir,
+      ((file) ->
+        if path.basename(file) == 'project.pros'
+          results.push path.dirname file
+      ),
+      ((d) ->
+        if !path.basename(d).startsWith '.'
+          try traversal d
+          catch e then)
+    traversal project for project in atom.project.getPaths()
+    return results

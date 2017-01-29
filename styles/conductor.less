@@ -1,0 +1,344 @@
+@import "octicon-mixins";
+@import "ui-variables";
+@import "purdueros";
+.pros-conductor-parent {
+    background-color: @base-background-color;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+.pros-conductor > .header {
+  display: flex;
+  padding-left: auto;
+  padding-right: auto;
+  align-items: center;
+  justify-content: center;
+  svg {
+      height: 6em;
+      width: 6em;
+      margin: 10px;
+  }
+  .title > h1 {
+      margin-bottom: 0.25em;
+  }
+  .title > h2 {
+      font-style: italic;
+      margin-top: 0.25em;
+  }
+}
+.pros-conductor {
+    padding: 1em;
+    max-width: 1000px;
+    margin: auto;
+    .error-presenter {
+        display: none;
+    }
+    .error-presenter.enabled {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 0 50px;
+        background-color: fade(@background-color-warning, 7%);
+        border-radius: 5px;
+        border-color: @background-color-error;
+        border-width: thin;
+        border-style: solid;
+    }
+    .error-presenter.enabled .background-message {
+        color: mix(@text-color-error, @text-color-subtle, 75%);
+        text-align: center;
+    }
+    .error-presenter.enabled > div {
+        flex-grow: 1;
+        padding-bottom: 20px;
+    }
+    .error-presenter.enabled ~:not(.error-presenter):not(.header) {
+        display: none !important;
+    }
+    .project,
+    .project-selector {
+        margin-top: 15px;
+    }
+    .project-selector {
+        display: flex;
+    }
+    .project-selector .inline-block-tight {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    .project-selector .recent-projects {
+        display: flex;
+        list-style-type: none;
+        padding-left: 0;
+        margin-top: auto;
+        margin-bottom: auto;
+        overflow-x: auto;
+        min-width: 250px;
+    }
+    .project-selector > * {
+        height: 4em;
+    }
+    .project-selector .recent-projects > li {
+        margin-left: 5px;
+        padding: 4px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        border-radius: 2px;
+        border-color: 0;
+        border-width: 0px;
+    }
+    .project-selector .recent-projects > .selected {
+        background-color: @background-color-selected;
+        font-weight: bold;
+    }
+    .project-selector .recent-projects > li:hover {
+        background-color: @background-color-highlight;
+    }
+    .project-selector .recent-projects > li > div {
+        align-self: center;
+    }
+    .project-selector .recent-projects > li .name {
+        width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .project-selector .recent-projects > li .dir {
+        width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: @text-color-subtle;
+        text-align: left;
+        direction: rtl;
+    }
+    .project.disabled {
+        visibility: collapse;
+    }
+    .project {
+      min-height: 14em;
+    }
+    .project >:first-child {
+        font-style: italic;
+    }
+    .project > div {
+        display: flex;
+        min-height: 11em;
+    }
+    .project .kernel {
+        flex-grow: 1;
+        padding: 5px;
+    }
+    .project h3 {
+        margin-top: 0;
+    }
+    .project .kernel > div > div {
+        display: flex;
+    }
+    .project .text-success .icon-move-up {
+        display: none;
+    }
+    .project .text-success ~ .btn-group .icon-move-up {
+        display: none;
+    }
+    .project .text-warning .icon-check {
+        display: none;
+    }
+    .project .kernel > div {
+        display: flex;
+        padding: 1em;
+    }
+    .project .kernel > div > div.btn-group {
+        margin-left: auto;
+    }
+    .project .libraries {
+        flex-grow: 3;
+        padding: 5px;
+        display: flex;
+        flex-direction: column
+    }
+    .project .libraries > div:first-child {
+        display: flex;
+        margin-bottom: 7px;
+        flex: 0 1 auto;
+    }
+    .project .libraries > div:first-child > h3 {
+        margin: auto 0;
+    }
+    .project .libraries > div:first-child > button {
+        margin-left: auto;
+    }
+    .libraries .list-group {
+        background-color: @app-background-color;
+        padding: 1em;
+        overflow-y: scroll;
+        flex: 1 1 auto;
+        margin-bottom: 10px;
+    }
+    .project .libraries .list-group .background-message {
+        text-align: center;
+        font-size: 2em;
+    }
+    .global > div:not(.header) {
+        display: flex;
+        flex-flow: row wrap;
+        align-content: space-between;
+        justify-content: space-between;
+    }
+    .global > div .kernel {
+        flex: 1 0 33%;
+        padding: 5px;
+    }
+    .global > div .libraries {
+        flex: 1 0 66%;
+        padding: 5px;
+    }
+    .global > div .depots {
+        flex: 0 1 66%;
+    }
+    .global h3 {
+        margin-top: 0;
+    }
+    .global {
+      .header {
+        display: flex;
+        h2, h3 {
+          flex-grow: 1;
+        }
+        .btn-group {
+          margin: auto 0;
+        }
+      }
+        table {
+            // padding: 1em;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            width: 100%;
+            table-layout: auto;
+            tbody {
+                background-color: @app-background-color;
+                overflow: auto;
+                max-height: 60px;
+            }
+            thead {
+                font-style: oblique;
+                color: @text-color-subtle;
+                background-color: @base-background-color;
+                display: table-header-group;
+            }
+            tr {
+                display: table-row;
+            }
+            tbody tr:hover {
+                background-color: @background-color-highlight;
+            }
+            tr >:nth-last-child(2),
+            tr >:nth-last-child(1) {
+                width: 25px;
+            }
+            tr >:nth-last-child(3) {
+                width: 100%;
+            }
+            td {
+                padding: 0 5px;
+                margin: 0 0;
+            }
+        }
+        .icon-trashcan:hover {
+            color: @text-color-error;
+            cursor: pointer;
+        }
+        .icon-cloud-download:hover {
+            color: @text-color-info;
+            cursor: pointer;
+        }
+        .depots {
+          .header {
+            display: flex !important;
+            margin-bottom: 7px;
+            flex: 0 1 auto;
+            h3 {
+              display: inline-block;
+            }
+            .btn-group {
+              margin-left: auto;
+              button.icon-file-add:hover{
+                color: @text-color-success;
+              }
+            }
+          }
+          .depot-input {
+            display: block;
+            margin: 3px;
+          }
+          h4 {
+            display: inline-block;
+          }
+          span {
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+            text-align: right;
+          }
+          span.icon-check {
+            color: @text-color-success;
+          }
+          span.icon-sync {
+            color: @text-color-warning;
+          }
+          span.icon-stop {
+            color: @text-color-error;
+          }
+          ul {
+            background-color: @app-background-color;
+            li {
+              padding: 3px 20px;
+            }
+            li:hover {
+              background-color: @background-color-highlight;
+            }
+            li.selected-depot {
+              background-color: @background-color-selected;
+              font-weight: bold;
+            }
+            .location {
+              float: right;
+            }
+          }
+        }
+    }
+}
+// CORNER RIBBON for BETA
+.wrapper {
+    margin: 50px auto;
+    width: 280px;
+    height: 370px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 90;
+}
+.ribbon-wrapper {
+    width: 85px;
+    height: 88px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.ribbon {
+    font: bold 15px Sans-Serif;
+    color: #333;
+    text-align: center;
+    text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;
+    -webkit-transform: rotate(45deg);
+    position: relative;
+    padding: 7px 0;
+    left: -5px;
+    top: 15px;
+    width: 120px;
+    background-image: -webkit-linear-gradient(top, #E7BC70, #D2AB67);
+    color: #2F2D29;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+}

@@ -24,10 +24,12 @@
     "command-exists": "^1.0.0",
     "event-kit": "^2.1.0",
     "fs-extra": "^0.26.1",
+    "semver": "^5.0.0",
     "split-string": "^0.1.0",
     "tempfile": "^1.1.0",
     "voucher": "^0.1.2",
-    "fs-plus": "^2.9.0"
+    "fs-plus": "^2.9.0",
+    "async": "^1.5.2"
   },
   "package-deps": [
     "linter",
@@ -49,7 +51,7 @@
     },
     "status-bar": {
       "versions": {
-        "1.0.0": "consumeStatusBar"
+        "^1.0.0": "consumeStatusBar"
       }
     },
     "runInTerminal": {
@@ -70,5 +72,12 @@
         "2.0.0": "autocompleteProvider"
       }
     }
+  },
+  "deserializers": {
+    "ConductorView": "deserializeConductorView",
+    "WelcomeView": "deserializeWelcomeView"
+  },
+  "cli_pros": {
+    "version": "2.4.1"
   }
 }
