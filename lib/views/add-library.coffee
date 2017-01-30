@@ -2,7 +2,6 @@
 {$, View, TextEditorView} = require 'atom-space-pen-views'
 fs = require 'fs'
 path = require 'path'
-cli = require '../cli'
 utils = require '../utils'
 proscli = require '../proscli'
 {prosConduct} = proscli
