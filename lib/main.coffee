@@ -119,7 +119,8 @@ module.exports =
           grammar.fileTypes.push 'pros'
           process.nextTick ->
             for e in atom.workspace.getTextEditors()
-              if path.extname(e.getPath()) == '.pros'
+              atom.workspace.getActiveTextEditor()
+              if Boolean(e.getPath()) and path.extname(e.getPath()) == '.pros'
                 e.setGrammar grammar
 
   deactivate: ->
