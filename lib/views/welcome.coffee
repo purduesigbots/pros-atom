@@ -140,14 +140,20 @@ module.exports =
                 Make sure PROS CLI is installed and available on PATH.
               </div>
               <div class='actions'>
-                <button class='btn btn-primary icon icon-globe' id='goToTroubleshootingPath'>
-                  Learn more
-                </button>
+              <div class='btn-group'>
+                  <button class='btn btn-primary icon icon-sync' id='restartAtomButton'>
+                    Restart Atom
+                  </button>
+                  <button class='btn btn-primary icon icon-globe' id='goToTroubleshootingPath'>
+                    Learn more
+                  </button>
+                </div>
               </div>
             </div>"
             # coffeelint: enable=max_line_length
             @cliUpdateOutlet.find('#goToTroubleshootingPath').click ->
               shell.openExternal 'http://pros.cs.purdue.edu/known-issues'
+            @cliUpdateOutlet.find('#restartAtomButton').click -> atom.restartApplication()
           when 3
             @cliVersion.text 'Error!'
             @cliVersion.addClass 'badge-error'
