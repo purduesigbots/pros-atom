@@ -1,7 +1,8 @@
 {CompositeDisposable, Disposable} = require 'atom'
 {$, ScrollView} = require 'atom-space-pen-views'
-{BaseView} = require './base-view'
+semver = require 'semver'
 shell = require 'shell'
+{BaseView} = require './base-view'
 utils = require '../utils'
 cli = require '../proscli'
 brand = require './brand'
@@ -107,26 +108,41 @@ module.exports =
             @cliVersion.addClass 'badge-error'
             @cliUpdateOutlet.addClass 'info'
             # coffeelint: disable=max_line_length
-            @cliUpdateOutlet.html "<div>
-              <span class='icon icon-info'></span>
-              <div>
-                PROS CLI is out of date! Some features may not be available.
-                 Update to #{minVersion} to get the latest features and bugfixes.
-              </div>
-              <div class='actions'>
-                <div class='btn-group'>
-                  <button class='btn btn-primary icon icon-cloud-download' id='downloadPROSUpdate'>
-                    Install
-                  </button>
-                  <button class='btn icon icon-sync' id='refreshPROSCLI'>
-                    Refresh
-                  </button>
+            if semver.lt o.version, '2.4.2'
+              if navigator.platform == 'Win32'
+                upgradeInstructions = 'run C:\\Program Files\\PROS\\update.exe .'
+              else
+                upgradeInstructions = 'run <code>pip3 install --upgrade pros-cli</code> from the terminal, or upgrade the CLI the way you installed it.'
+              @cliUpdateOutlet.html "<div>
+                <span class='icon icon-info'></span>
+                <div>
+                  PROS CLI is out of date! Some features may not be available.
+                  Update to #{minVersion} to get the latest features and patches.
+                  Future updates will be done through Atom. <b>To get this update, #{upgradeInstructions}</b> Then, restart Atom.
                 </div>
-              </div>
-            </div>"
-            @cliUpdateOutlet.find('#downloadPROSUpdate').click -> cli.invUpgrade cb: (c, o, e) ->
-              console.log {c, o, e}
-            @cliUpdateOutlet.find('#refreshPROSCLI').click => @checkCli true
+              </div>"
+              @cliUpdateOutlet.find('#refreshPROSCLI').click => @checkCli true
+            else
+              @cliUpdateOutlet.html "<div>
+                <span class='icon icon-info'></span>
+                <div>
+                  PROS CLI is out of date! Some features may not be available.
+                   Update to #{minVersion} to get the latest features and patches.
+                </div>
+                <div class='actions'>
+                  <div class='btn-group'>
+                    <button class='btn btn-primary icon icon-cloud-download' id='downloadPROSUpdate'>
+                      Install
+                    </button>
+                    <button class='btn icon icon-sync' id='refreshPROSCLI'>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+              </div>"
+              @cliUpdateOutlet.find('#downloadPROSUpdate').click -> cli.invUpgrade cb: (c, o, e) ->
+                console.log {c, o, e}
+              @cliUpdateOutlet.find('#refreshPROSCLI').click => @checkCli true
             # coffeelint: enable=max_line_length
           when 2
             @cliVersion.text 'Error!'
