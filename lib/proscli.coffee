@@ -143,7 +143,7 @@ module.exports =
         wait 75 # hard code waits to allow commands to be executed
         currentTerminal.insertSelection(if navigator.platform is 'Win32' then 'cls' else 'clear')
         wait 75
-        currentTerminal.insertSelection command.join ' '
+        currentTerminal.insertSelection cmd.join ' '
         currentTerminal.focus()
       else
         currentTerminal = terminalService.run([cmd.join ' '])[0].spacePenView
