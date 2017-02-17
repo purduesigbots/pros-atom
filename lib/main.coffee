@@ -144,7 +144,7 @@ module.exports =
           atom.project.getPaths()[0]) + '"'
       ]
 
-  toggleTerminal: -> cli.serialInTerminal()
+  toggleTerminal: -> cli.executeInTerminal cmd: ['pros', 'terminal']
 
   consumeToolbar: (toolBarRegister) ->
     getToolBar = toolBarRegister
