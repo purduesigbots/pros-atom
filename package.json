@@ -1,7 +1,7 @@
 {
   "name": "pros",
   "main": "./lib/main",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Provides integration with the PROS ecosystem",
   "keywords": [
     "pros",
