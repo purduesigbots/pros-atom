@@ -94,7 +94,9 @@ module.exports =
           cliVer = {code: 3, extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
           respond cliVer
           return
-        version = /pros, version (.*)/.exec(o)?[1]
+        # coffeelint: disable=max_line_length
+        version = /pros, version \b(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)\b/.exec(o)?[1]
+        # coffeelint: enable=max_line_length
         if version is undefined
           # try again one more time, just in case
           @execute cmd: ['pros', '--version'], nosb: nosb, cb: (c, o) ->
@@ -103,7 +105,9 @@ module.exports =
               cliVer = {code: 3, extra: extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
               respond cliVer
               return
-            version = /pros, version(.*)/.exec(o)?[1]
+            # coffeelint: disable=max_line_length
+            version = /pros, version \b(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)\b/.exec(o)?[1]
+            # coffeelint: enable=max_line_length
             if !version or semver.lt version, minVersion
               # console.log o
               cliVer = {code: 1, extra: "v#{version} does not meet v#{minVersion}", version: version}
