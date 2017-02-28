@@ -36,7 +36,7 @@ handlers =
     return unless atom.workspace.getActiveTextEditor()
     dir = atom.workspace.getActiveTextEditor().getPath()
     for [1...(options?.directory?.recurseTimes or 5)]
-      if !!dir
+      if typeof dir isnt 'string'
         break
       dir = path.dirname dir
       try
