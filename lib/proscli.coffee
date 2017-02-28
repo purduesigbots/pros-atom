@@ -95,7 +95,7 @@ module.exports =
           respond cliVer
           return
         # coffeelint: disable=max_line_length
-        version = /pros, version \bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?\b/.exec(o)?[1]
+        version = /pros, version \b(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)\b/.exec(o)?[1]
         # coffeelint: enable=max_line_length
         if version is undefined
           # try again one more time, just in case
@@ -106,7 +106,7 @@ module.exports =
               respond cliVer
               return
             # coffeelint: disable=max_line_length
-            version = /pros, version \bv?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?\b/.exec(o)?[1]
+            version = /pros, version \b(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)\b/.exec(o)?[1]
             # coffeelint: enable=max_line_length
             if !version or semver.lt version, minVersion
               # console.log o
