@@ -129,9 +129,9 @@ module.exports =
         atom.notifications.addError 'Unable to determine how PROS CLI is installed',
             detail: 'You will need to upgrade PROS CLI for your intallation method.'
       else
-        cmd = o.split '\n'
+        cmd = o.split('\n').filter(Boolean).map Function.prototype.call, String.prototype.trim
         if not atom.inDevMode()
-          @execute cmd: cmd, cb: (c, o, e) -> console.log {c, o, e}
+          cp.execFile cmd[0], cmd[1..]
         else
           console.log "Running #{cmd.join ' '}"
 

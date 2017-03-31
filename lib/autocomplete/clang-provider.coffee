@@ -45,7 +45,7 @@ class ClangProvider
     new Promise (resolve) =>
       allOutput = []
       stdout = (output) -> allOutput.push output
-      stderr = (output) -> console.log output
+      stderr = (output) ->
       exit = (code) => resolve(@handleCompletionResult(allOutput.join('\n'), code, prefix))
       bufferedProcess = new BufferedProcess({command, args, options, stdout, stderr, exit})
       bufferedProcess.process.stdin.setEncoding = 'utf-8'
@@ -101,12 +101,13 @@ class ClangProvider
 
   buildClangArgs: (editor, row, column, language) ->
     settings = config.settings()
-    std = if language == 'c' then 'c99' else language
+    if language == 'c' then std = 'c99'
+    if language == 'c++' then std = 'c++14'
     currentDir = path.dirname(editor.getPath())
     projectRoot = utils.findRoot atom.workspace.getActiveTextEditor().getPath()
 
     args = ["-fsyntax-only"]
-    args.push "-x#{language}"
+    args.push "-x", "#{language}"
     args.push "-std=#{std}" if std
     args.push "-Xclang", "-code-completion-macros"
     args.push "-Xclang", "-code-completion-at=-:#{row + 1}:#{column + 1}"
