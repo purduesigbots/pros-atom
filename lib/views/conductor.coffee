@@ -253,7 +253,7 @@ module.exports =
           cb: (c, o, e) =>
             if c == 0
               atom.notifications.addSuccess "Downloaded kernel #{template.version}"
-              @updateGlobalListing()
+              @updateGlobalLibraries()
         }
       @on 'click', '.global .depot-item', (e) =>
         @selectedDepotStatus.show()
