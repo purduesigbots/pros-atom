@@ -2,6 +2,7 @@
 {$, View, TextEditorView} = require 'atom-space-pen-views'
 fs = require 'fs'
 path = require 'path'
+std = require './standard'
 {prosConduct} = cli = require '../proscli'
 
 module.exports =
