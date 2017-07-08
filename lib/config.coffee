@@ -103,4 +103,4 @@ module.exports =
       title: 'Locale when running PROS CLI'
       description: 'If the default value isn\'t working, try changing this field to C.UTF-8 '+\
                    'or to \'inherit\' to possibly inherit from the system environment.'
-      default: 'en_us.utf-8'
+      default: 'en_US.UTF-8'
