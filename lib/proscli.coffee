@@ -24,8 +24,9 @@ module.exports =
     errBuf = ''
     # cmd = cmd.join ' '
     env = process.env
-    env['LC_ALL'] = 'en_US.utf-8'
-    env['LANG'] = 'en_US.utf-8'
+    if atom.config.get 'pros.locale'
+      env['LC_ALL'] = atom.config.get 'pros.locale'
+      env['LANG'] = atom.config.get 'pros.locale'
     proc = cp.spawn cmd[0], cmd[1..],
       env: env
       cwd: params?.cwd
@@ -102,7 +103,7 @@ module.exports =
           @execute cmd: ['pros', '--version'], nosb: nosb, cb: (c, o) ->
             if c != 0
               # console.log o
-              cliVer = {code: 3, extra: extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
+              cliVer = {code: 3, extra: "STDOUT:#{eol}#{o}#{eol}#{eol}ERR:#{eol}#{e}"}
               respond cliVer
               return
             # coffeelint: disable=max_line_length
@@ -124,7 +125,7 @@ module.exports =
         respond cliVer
 
   invUpgrade: (callback) ->
-    @execute cmd: ['pros', 'upgrade', '--machine-output'], cb: (c, o, e) =>
+    @execute cmd: ['pros', 'upgrade', '--machine-output'], cb: (c, o, e) ->
       if c != 0
         atom.notifications.addError 'Unable to determine how PROS CLI is installed',
             detail: 'You will need to upgrade PROS CLI for your intallation method.'

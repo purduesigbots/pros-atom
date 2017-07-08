@@ -98,3 +98,8 @@ module.exports =
         on_the_fly:
           type: 'boolean'
           default: true
+    locale:
+      type: 'string'
+      title: 'Locale when running PROS CLI'
+      description: 'If the default value isn\'t working, try C.UTF-8 or blank to possibly inherit.'
+      default: 'en_us.utf-8'
