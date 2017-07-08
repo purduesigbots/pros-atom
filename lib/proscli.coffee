@@ -24,7 +24,7 @@ module.exports =
     errBuf = ''
     # cmd = cmd.join ' '
     env = process.env
-    if atom.config.get 'pros.locale'
+    if atom.config.get('pros.locale') != "inherit"
       env['LC_ALL'] = atom.config.get 'pros.locale'
       env['LANG'] = atom.config.get 'pros.locale'
     proc = cp.spawn cmd[0], cmd[1..],
