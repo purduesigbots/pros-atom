@@ -189,10 +189,10 @@ module.exports =
                 </div>
               </div>
             </div>"
-            # coffeelint: enable=max_line_length
             @cliUpdateSubscriptions.add atom.tooltips.add @cliUpdateOutlet.find('#goToTroubleshootingPath'), title: 'Learn more'
-            @cliUpdateSubscriptions.add atom.tooltips.add @cliUpdateOutlet.find('#copyOutput'), title: 'Copy output'
+            @cliUpdateSubscriptions.add atom.tooltips.add @cliUpdateOutlet.find('#copyOutput'), title: 'Copy error message'
             @cliUpdateSubscriptions.add atom.tooltips.add @cliUpdateOutlet.find('#refreshPROSCLI'), title: 'Refresh'
+            # coffeelint: enable=max_line_length
             @cliUpdateOutlet.find('#goToTroubleshootingPath').click ->
               shell.openExternal 'http://pros.cs.purdue.edu/known-issues'
             @cliUpdateOutlet.find('#copyOutput').click ->
