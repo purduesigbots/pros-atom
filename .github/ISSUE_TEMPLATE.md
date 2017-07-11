@@ -5,11 +5,11 @@
 #### Steps to reproduce:
 
 #### System information:
-Operating System:  (Windows, OS X, Ubuntu)
+Operating System (e.g. Windows, OS X, Ubuntu):
 
-Atom Version: (Atom Version)
+Atom Version:
 
-Plugin Version: (Plugin Version)
+Plugin Version (PROS version):
 
 #### Additional Information
 
