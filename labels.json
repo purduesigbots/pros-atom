@@ -1,0 +1,28 @@
+[
+    { "name": "Type: Bug", "color": "#ee0701"  },
+    { "name": "Type: Enhancement", "color": "#d93f0b"  },
+    { "name": "Type: Feature Request", "color": "#fbca04"  },
+    { "name": "Type: Question", "color": "#d4c5f9"  },
+    { "name": "Project: pros-atom", "color": "#5319e7"  },
+    { "name": "Project: pros-cli", "color": "#5319e7"  },
+    { "name": "Project: pros-docs", "color": "#5319e7"  },
+    { "name": "Project: PROS Kernel", "color": "#5319e7"  },
+    { "name": "Project: Installers", "color": "#5319e7"  },
+    { "name": "Platform: Any", "color": "#0052cc" },
+    { "name": "Platform: Windows", "color": "#0052cc"  },
+    { "name": "Platform: MacOS", "color": "#0052cc"  },
+    { "name": "Platform: *nix", "color": "#0052cc"  },
+    { "name": "Status: TODO", "color": "#fef2c0"  },
+    { "name": "Status: In Progress", "color": "#c2e0c6"  },
+    { "name": "Status: In Review", "color": "#0e8a16"  },
+    { "name": "Status: On Hold", "color": "#000000"  },
+    { "name": "Status: Duplicate", "color": "#cccccc"  },
+    { "name": "Status: Invalid", "color": "#e6e6e6"  },
+    { "name": "Status: WONTFIX", "color": "#ffffff"  },
+    { "name": "Status: Community Help Wanted", "color": "#bfd4f2"  },
+    { "name": "Status: Workaround Available", "color": "#006b75"  },
+    { "name": "Priority: High", "color": "#b60205"  },
+    { "name": "Priority: Medium", "color": "#fbca04"  },
+    { "name": "Priority: Low", "color": "#0e8a16"  }
+
+]

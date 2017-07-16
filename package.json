@@ -29,7 +29,8 @@
     "tempfile": "^1.1.0",
     "voucher": "^0.1.2",
     "fs-plus": "^2.9.0",
-    "async": "^1.5.2"
+    "async": "^1.5.2",
+    "etch": "^0.12.5"
   },
   "package-deps": [
     "linter",
