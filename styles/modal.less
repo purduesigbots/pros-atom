@@ -86,12 +86,18 @@
 }
 
 .pros-add-library {
+  padding: 20px 10px;
   .library-picker {
-    div {
-      margin: 15px 0;
+      ol {
+        max-height: 100px;
+        overflow-y: auto;
+      }
+    li.select {
+      background-color: @background-color-selected;
+      font-weight: bold;
     }
-    div:not(.error-presenter) {
-      color: mix(@text-color-error, @text-color-subtle, 75%);
+    li:hover {
+      background-color: @background-color-highlight;
     }
   }
 }

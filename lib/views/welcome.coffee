@@ -77,7 +77,7 @@ module.exports =
 
       @checkCli()
       pkgVer = @pkgVersion[0].textContent = atom.packages.getLoadedPackage('pros').metadata.version
-      @versions[0].onclick = -> atom.clipboard.write "PROS CLI: #{@cliVersion.text()} - Package: #{pkgVer}"
+      @versions[0].onclick = => atom.clipboard.write "PROS CLI: #{@cliVersion.text()} - Package: #{pkgVer}"
 
       @subscriptions.add atom.tooltips.add @gaInput,
       {

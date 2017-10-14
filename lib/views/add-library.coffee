@@ -107,6 +107,14 @@ module.exports =
       @panel.show()
       @projectPathEditor.focus()
 
+      @on 'click', '.library-picker li', (e) =>
+        @selected?.removeClass 'selected'
+        @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
+        @selected = $(e.target).closest 'li.library-option'
+        updateDisable()
+        @selected.addClass 'selected'
+        @selected.children('.primary-line').addClass 'icon icon-chevron-right'
+
       proscli.execute {
         cmd: prosConduct 'ls-template', '--libraries', '--offline-only', '--machine-output'
         cb: (c, o, e) =>
@@ -138,13 +146,6 @@ module.exports =
             <div class='primary-line'>#{library}</div>
             <div class='secondary-line'><em>version</em> #{version} <em>from</em>
             #{depot}</div>"
-            li.click = =>
-              @selected?.removeClass 'selected'
-              @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
-              @selected = $(e.target).closest 'li.library-option'
-              updateDisable()
-              @selected.addClass 'selected'
-              @selected.children('.primary-line').addClass 'icon icon-chevron-right'
             @libraryList.append li
       }
 
