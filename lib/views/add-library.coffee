@@ -91,7 +91,7 @@ module.exports =
         template = @selected.data 'value'
         $(@element).find('.actions').addClass 'working'
         proscli.execute {
-          cmd: prosConduct 'new-lib', "\"#{dir}\"", template.library, template.version, template.depot
+          cmd: prosConduct 'new-lib', dir, template.library, template.version, template.depot
           cb: (c, o, e) =>
             @cancel true
             if c == 0
