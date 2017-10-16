@@ -131,7 +131,7 @@ module.exports =
             detail: 'You will need to upgrade PROS CLI for your intallation method.'
       else
         cmd = o.split('\n').filter(Boolean).map Function.prototype.call, String.prototype.trim
-        if navigator.platform == "Win32" and cmd.length == 3  # fix for calling upgrader on Windows
+        if navigator.platform == "Win32" and cmd[0].endsWith "updater.exe"  # fix for calling upgrader on Windows
           cmd[1] = "/checknow"
           cmd[2] = "/reducedgui"
         if not atom.inDevMode()
