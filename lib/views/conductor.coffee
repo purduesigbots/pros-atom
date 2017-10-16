@@ -252,7 +252,7 @@ module.exports =
           cmd: prosConduct('download', template.name, template.version, template.depot),
           cb: (c, o, e) =>
             if c == 0
-              atom.notifications.addSuccess "Downloaded kernel #{template.version}"
+              atom.notifications.addSuccess "Downloaded #{template.name} #{template.version}"
               @updateGlobalLibraries()
         }
       @on 'click', '.global .depot-item', (e) =>

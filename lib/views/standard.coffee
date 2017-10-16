@@ -58,7 +58,6 @@ module.exports =
             Object.assign(@depotConfigCache, JSON.parse o)
             if @depotConfigCache.hasOwnProperty registrar
               @fillDepotConfig @depotConfigCache[registrar].config
-            console.log @depotConfigCache
           catch err
             console.error err
         else console.log {c, o, e}

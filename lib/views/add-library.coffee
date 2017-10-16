@@ -91,7 +91,7 @@ module.exports =
         template = @selected.data 'value'
         $(@element).find('.actions').addClass 'working'
         proscli.execute {
-          cmd: prosConduct 'new-lib', "\"#{dir}\"", template.library, template.version, template.depot
+          cmd: prosConduct 'new-lib', dir, template.library, template.version, template.depot
           cb: (c, o, e) =>
             @cancel true
             if c == 0
@@ -106,6 +106,14 @@ module.exports =
       if !!_path then @projectPathEditor.setText _path
       @panel.show()
       @projectPathEditor.focus()
+
+      @on 'click', '.library-picker li', (e) =>
+        @selected?.removeClass 'selected'
+        @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
+        @selected = $(e.target).closest 'li.library-option'
+        updateDisable()
+        @selected.addClass 'selected'
+        @selected.children('.primary-line').addClass 'icon icon-chevron-right'
 
       proscli.execute {
         cmd: prosConduct 'ls-template', '--libraries', '--offline-only', '--machine-output'
@@ -138,13 +146,6 @@ module.exports =
             <div class='primary-line'>#{library}</div>
             <div class='secondary-line'><em>version</em> #{version} <em>from</em>
             #{depot}</div>"
-            li.click = =>
-              @selected?.removeClass 'selected'
-              @selected?.children('.primary-line').removeClass 'icon icon-chevron-right'
-              @selected = $(e.target).closest 'li.library-option'
-              updateDisable()
-              @selected.addClass 'selected'
-              @selected.children('.primary-line').addClass 'icon icon-chevron-right'
             @libraryList.append li
       }
 
