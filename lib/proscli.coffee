@@ -4,6 +4,7 @@ cp = require 'child_process'
 semver = require 'semver'
 statusbar = require './views/statusbar'
 {EOL} = require 'os'
+shell = require 'shell'
 brand = require './views/brand'
 {setTimeout} = require 'timers'
 
@@ -128,9 +129,14 @@ module.exports =
     @execute cmd: ['pros', 'upgrade', '--machine-output'], cb: (c, o, e) ->
       if c != 0
         atom.notifications.addError 'Unable to determine how PROS CLI is installed',
-            detail: 'You will need to upgrade PROS CLI for your intallation method.'
+            detail: 'You will need to upgrade PROS CLI manually.'
+            buttons: [
+              { className: 'btn btn-info', text: 'Open GitHub', onDidClick: -> shell.openExternal 'https://github.com/purduesigbots/pros/releases/latest' }
+            ]
       else
         cmd = o.split('\n').filter(Boolean).map Function.prototype.call, String.prototype.trim
+        if navigator.platform != "Win32" and cmd[0].endsWith "updater.exe"  # fix for frozen pacakging on alternative distributions
+          shell.openExternal "http://github.com/purduesigbots/pros-cli/releases/latest"
         if navigator.platform == "Win32" and cmd[0].endsWith "updater.exe"  # fix for calling upgrader on Windows
           cmd[1] = "/checknow"
           cmd[2] = "/reducedgui"

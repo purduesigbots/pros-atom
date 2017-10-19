@@ -1,7 +1,8 @@
-{CompositeDisposable} = require 'atom'
+{CompositeDisposable, Range} = require 'atom'
 {$, View, TextEditorView} = require 'atom-space-pen-views'
 fs = require 'fs'
 path = require 'path'
+os = require 'os'
 std = require './standard'
 {prosConduct} = cli = require '../proscli'
 
@@ -37,6 +38,10 @@ module.exports =
       @createButton.prop 'disabled', true
       @projectPathEditor.getModel().onDidChange =>
         @createButton.prop 'disabled', !!!@projectPathEditor.getText()
+
+      defaultPath = path.join path.dirname(atom.project.getPaths()[0]) or os.homedir(), 'pros-project'
+      @projectPathEditor.setText defaultPath
+      @projectPathEditor.getModel().setSelectedBufferRange [[0, defaultPath.length - 'pros-project'.length], [0, defaultPath.length]]
 
       @openDir.click => atom.pickFolder (paths) =>
         if paths?[0]
