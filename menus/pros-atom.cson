@@ -3,6 +3,10 @@
     'label': 'PROS'
     'submenu': [
       {
+        'label': 'PROS Conductor',
+        'command': 'PROS:Open-Conductor'
+      },
+      {
         'label': 'Create new PROS Project'
         'command': 'PROS:New-Project'
       },
