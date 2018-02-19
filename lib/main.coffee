@@ -64,6 +64,7 @@ module.exports =
         else new (require './views/upgrade-project')
       atom.commands.add 'atom-workspace', 'PROS:Register-Project': -> new (require './views/register-project')
       atom.commands.add 'atom-workspace', 'PROS:Upload-Project': => @uploadProject()
+      atom.commands.add 'atom-workspace', 'PROS:Make-Project': => @makeProject()
       atom.commands.add 'atom-workspace', 'PROS:Toggle-Terminal': => @toggleTerminal()
       atom.commands.add 'atom-workspace', 'PROS:Show-Welcome': -> atom.workspace.open welcomeUri
       atom.commands.add 'atom-workspace', 'PROS:Toggle-PROS': ->
@@ -140,6 +141,14 @@ module.exports =
     if atom.project.getPaths().length > 0
       cli.executeInTerminal cmd: [
         'pros', 'flash', '-f', '"' +
+        (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
+          atom.project.getPaths()[0]) + '"'
+      ]
+
+  makeProject: ->
+    if atom.project.getPaths().length > 0
+      cli.executeInTerminal cmd: [
+        'pros', 'make', '"' +
         (atom.project.relativizePath(atom.workspace.getActiveTextEditor()?.getPath())[0] or \
           atom.project.getPaths()[0]) + '"'
       ]

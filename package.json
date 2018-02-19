@@ -1,43 +1,47 @@
 {
-  "name": "pros",
-  "main": "./lib/main",
-  "version": "0.7.4",
-  "description": "Provides integration with the PROS ecosystem",
-  "keywords": [
-    "pros",
-    "vex",
-    "robotics",
-    "cortex",
-    "vrc",
-    "purdue"
+  "_args": [
+    [
+      {
+        "raw": "/tmp/d-11805-17548-an7l2t/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/tmp/d-11805-17548-an7l2t/package.tgz",
+        "spec": "/tmp/d-11805-17548-an7l2t/package.tgz",
+        "type": "local"
+      },
+      "/tmp/apm-install-dir-11805-17548-a2bewh"
+    ]
   ],
-  "repository": "https://github.com/purduesigbots/pros-atom",
-  "license": "MPL-2.0",
-  "engines": {
-    "atom": ">=1.0.0 <2.0.0"
+  "_from": "../d-11805-17548-an7l2t/package.tgz",
+  "_id": "pros@0.7.4",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/pros",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/tmp/d-11805-17548-an7l2t/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/tmp/d-11805-17548-an7l2t/package.tgz",
+    "spec": "/tmp/d-11805-17548-an7l2t/package.tgz",
+    "type": "local"
   },
-  "dependencies": {
-    "atom-linter": "^4.3.3",
-    "atom-space-pen-views": "^2.1.1",
-    "atom-package-deps": "^4.0.0",
-    "clang-flags": "0.2.2",
-    "command-exists": "^1.0.0",
-    "event-kit": "^2.1.0",
-    "fs-extra": "^0.26.1",
-    "semver": "^5.0.0",
-    "split-string": "^0.1.0",
-    "tempfile": "^1.1.0",
-    "voucher": "^0.1.2",
-    "fs-plus": "^2.9.0",
-    "async": "^1.5.2"
-  },
-  "package-deps": [
-    "linter",
-    "tool-bar",
-    "tool-bar-main",
-    "build",
-    "platformio-ide-terminal"
+  "_requiredBy": [
+    "#USER"
   ],
+  "_resolved": "file:../d-11805-17548-an7l2t/package.tgz",
+  "_shasum": "655f35737db7fca9fb2cb8d2701517937cf773ff",
+  "_shrinkwrap": null,
+  "_spec": "/tmp/d-11805-17548-an7l2t/package.tgz",
+  "_where": "/tmp/apm-install-dir-11805-17548-a2bewh",
+  "bugs": {
+    "url": "https://github.com/purduesigbots/pros-atom/issues"
+  },
+  "cli_pros": {
+    "version": "2.6.1"
+  },
   "consumedServices": {
     "tool-bar": {
       "versions": {
@@ -60,6 +64,50 @@
       }
     }
   },
+  "dependencies": {
+    "async": "^1.5.2",
+    "atom-linter": "^4.3.3",
+    "atom-package-deps": "^4.0.0",
+    "atom-space-pen-views": "^2.1.1",
+    "clang-flags": "0.2.2",
+    "command-exists": "^1.0.0",
+    "event-kit": "^2.1.0",
+    "fs-extra": "^0.26.1",
+    "fs-plus": "^2.9.0",
+    "semver": "^5.0.0",
+    "split-string": "^0.1.0",
+    "tempfile": "^1.1.0",
+    "voucher": "^0.1.2"
+  },
+  "description": "Provides integration with the PROS ecosystem",
+  "deserializers": {
+    "ConductorView": "deserializeConductorView",
+    "WelcomeView": "deserializeWelcomeView"
+  },
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/purduesigbots/pros-atom#readme",
+  "keywords": [
+    "pros",
+    "vex",
+    "robotics",
+    "cortex",
+    "vrc",
+    "purdue"
+  ],
+  "license": "MPL-2.0",
+  "main": "./lib/main",
+  "name": "pros",
+  "optionalDependencies": {},
+  "package-deps": [
+    "linter",
+    "tool-bar",
+    "tool-bar-main",
+    "build",
+    "platformio-ide-terminal"
+  ],
   "providedServices": {
     "builder": {
       "description": "Runs GNU Make for PROS",
@@ -73,11 +121,11 @@
       }
     }
   },
-  "deserializers": {
-    "ConductorView": "deserializeConductorView",
-    "WelcomeView": "deserializeWelcomeView"
+  "readme": "# PROS for Atom\n\n[![GitHub version](https://badge.fury.io/gh/purduesigbots%2Fpros-atom.svg)](https://badge.fury.io/gh/purduesigbots%2Fpros-atom)\n\nPROS is the only open source development environment for the VEX EDR Platform.\n\nThis plugin provides support for Atom, the official IDE of the PROS Development Team. For PROS-specific functionality, it interacts with the [PROS CLI](https://github.com/purduesigbots/pros-cli).\n\nThe main repository for the PROS kernel is located at https://github.com/purduesigbots/pros\n\nThe PROS plugin provides the following functionality, in addition to being a UI for the CLI:\n - Autocomplete (provider for [autocomplete-plus](https://atom.io/plugins/autocomplete-plus) and fork of [autocomplete-clang](https://atom.io/plugins/autocomplete-clang))\n - Linting (fork of [linter-gcc](https://atom.io/plugins/linter-gcc))\n - Building (provider for [build](https://atom.io/plugins/build))\n\n## Installation\nTo install PROS for Atom, download [Atom](https://atom.io), [Clang](https://clang.llvm.org), and the latest [PROS toolchain/CLI](https://github.com/purduesigbots/pros/releases/latest). Then, install the [pros](https://atom.io/packages/pros) package. Alternatively, installers are available for most platforms in the [pros](https://github.com/purduesigbots/pros/releases) repository.\n\n## License\nThe PROS kernel source code and this project is licensed under the Mozilla Public License 2.0. The complete license can be found in the [LICENSE file](../blob/master/LICENSE).\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purduesigbots/pros-atom.git"
   },
-  "cli_pros": {
-    "version": "2.6.1"
-  }
+  "version": "0.7.4"
 }

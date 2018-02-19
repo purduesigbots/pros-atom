@@ -17,7 +17,11 @@
       {
         'label': 'Upload Project'
         'command': 'PROS:Upload-Project'
-      }
+      },
+      {
+        'label': 'Build Project'
+        'command': 'PROS:Make-Project'
+      },
       {
         'label': 'Toggle PROS-Atom Google Analytics'
         'command': 'PROS:Toggle-GA'

@@ -1,2 +1,3 @@
 'atom-workspace atom-text-editor:not([mini])':
-  'ctrl-f9': 'PROS:Upload-Project'
+  'ctrl-f9': 'PROS:Upload-Project',
+  'ctrl-f8': 'PROS:Make-Project'
